@@ -16,13 +16,15 @@ def parse_predicate(input_string):
                 PREP: to
 
     """
-#    import re
+    import re
+    
     all_list = []
     arguments_list = []
     predicate = []
     dobj = []
     parg = []
     oarg = []
+    
     input_string = input_string.split('\n')
     for i in range (0,len(input_string)):
         if 'PRED:' in input_string[i]:
@@ -31,7 +33,11 @@ def parse_predicate(input_string):
             dobjs_per_verb = ''
             predicate.append(input_string[i].split(': ')[1])
         elif 'DOBJ' in input_string[i]:
-            dobjs_per_verb = input_string[i].split(': ')[1]
+            dobjs_splitted = re.split('DOBJ: |, ', input_string[i])
+            if dobjs_splitted[0] == '  ':
+                dobjs_per_verb = dobjs_splitted[1:]
+            else:
+                dobjs_per_verb = dobjs_splitted
         elif 'PARG' in input_string[i]:
             pargs_per_verb.append(input_string[i].split(': ')[1])
         elif 'OARG' in input_string[i]:
@@ -52,17 +58,10 @@ def parse_predicate(input_string):
             continue
         
     for j in range (0,len(predicate)):
-        print len(predicate)
-        print len(dobj)
-        print dobj
-        print len(parg)
-        print parg
-        print len(oarg)
-        print oarg
         arguments_list = [dobj[j],parg[j],oarg[j]]
         tuple_pred = (predicate[j],arguments_list)
         all_list.append(tuple_pred)
-    return (all_list, input_string) 
+    return (all_list) 
     
             
    
