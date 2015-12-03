@@ -1,0 +1,196 @@
+(lp0
+S'baster'
+p1
+aS'chafing dish'
+p2
+aS'cooker'
+p3
+aS'cookie sheet'
+p4
+aS'baking tray'
+p5
+aS'enamelware'
+p6
+aS'grid'
+p7
+aS'gridiron'
+p8
+aS'griddle'
+p9
+aS'pan'
+p10
+aS'cooking pan'
+p11
+aS'poacher'
+p12
+aS'pot'
+p13
+aS'skimmer'
+p14
+aS'steamer'
+p15
+aS'turner'
+p16
+aS'food turner'
+p17
+aS'crock pot'
+p18
+aS'popper'
+p19
+aS'cloisonne'
+p20
+aS'graniteware'
+p21
+aS'dripping pan'
+p22
+aS'drip pan'
+p23
+aS'frying pan'
+p24
+aS'frypan'
+p25
+aS'skillet'
+p26
+aS'omelet pan'
+p27
+aS'omelette pan'
+p28
+aS'patty-pan'
+p29
+aS'roaster'
+p30
+aS'saucepan'
+p31
+aS'wok'
+p32
+aS'caldron'
+p33
+aS'cauldron'
+p34
+aS'coffeepot'
+p35
+aS'dixie'
+p36
+aS'dutch oven'
+p37
+aS'kettle'
+p38
+aS'boiler'
+p39
+aS'marmite'
+p40
+aS'pottle'
+p41
+aS'saucepot'
+p42
+aS'stockpot'
+p43
+aS'teapot'
+p44
+aS'urn'
+p45
+aS'fish slice'
+p46
+aS'pancake turner'
+p47
+aS'spatula'
+p48
+aS'electric frying pan'
+p49
+aS'spider'
+p50
+aS'double boiler'
+p51
+aS'double saucepan'
+p52
+aS'stewing pan'
+p53
+aS'stewpan'
+p54
+aS'drip pot'
+p55
+aS'percolator'
+p56
+aS'teakettle'
+p57
+aS'coffee urn'
+p58
+aS'samovar'
+p59
+aS'tea urn'
+p60
+aS'coffee maker'
+p61
+aS'disposal'
+p62
+aS'electric pig'
+p63
+aS'garbage disposal'
+p64
+aS'food processor'
+p65
+aS'hot plate'
+p66
+aS'hotplate'
+p67
+aS'ice maker'
+p68
+aS'microwave'
+p69
+aS'microwave oven'
+p70
+aS'oven'
+p71
+aS'stove'
+p72
+aS'kitchen stove'
+p73
+aS'range'
+p74
+aS'kitchen range'
+p75
+aS'cooking stove'
+p76
+aS'toaster'
+p77
+aS'toaster oven'
+p78
+aS'waffle iron'
+p79
+aS'espresso maker'
+p80
+aS'silex'
+p81
+aS'broiler'
+p82
+aS'dutch oven'
+p83
+aS'gas oven'
+p84
+aS'rotisserie'
+p85
+aS'tandoor'
+p86
+aS'charcoal burner'
+p87
+aS'cookstove'
+p88
+aS'electric range'
+p89
+aS'gas range'
+p90
+aS'gas stove'
+p91
+aS'gas cooker'
+p92
+aS'potbelly'
+p93
+aS'potbelly stove'
+p94
+aS'primus stove'
+p95
+aS'primus'
+p96
+aS'spirit stove'
+p97
+a.

@@ -10,7 +10,7 @@ import pred as pred
 
 reload(pred)
 
-rootdir = "C:\Users\Celeste\Documents\Masters\AllRecipesData"
+rootdir = "..\AllRecipesData\chunked"
 
 seg = 0
 ann = 0
@@ -22,16 +22,17 @@ for subdir, dirs, files in os.walk(rootdir):
         if file == ".DS_Store":
             continue
         else:
-            if "amish-meatloaf" in file:
-            #if "\AllRecipesData\chunked" in subdir:
+            # if "amish-meatloaf" in file:
+            if "\AllRecipesData\chunked" in subdir:
                 path = "\AllRecipesData\chunked"
                 path2 = rootdir + "/DevSet-annotations/"
                 filename = os.path.splitext(file)[0]
-                new_file = open(path2 + filename + '.ann', 'w')
+                # new_file = open(path2 + filename + '.ann', 'w')
                 path = os.path.join(subdir, file)
                 f = open(path,'r')
+                # print path
                 (all_list) = pred.parse_predicate(f.read())
-                print all_list
+                # print all_list
                 break
                 #new_file.write( + '\n')
 
