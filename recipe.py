@@ -10,9 +10,12 @@ from pprint import *
 class Recipe(object):
     """docstring for Recipe"""
 
+    foods = None
+    cookware = None
 
     def __init__(self, filepath):
         self.filepath = filepath
+        print self.foods
         pkl_file = open('foods.pkl', 'rb')
         self.foods = pickle.load(pkl_file)
         pkl_file = open('cookware.pkl', 'rb')
@@ -20,7 +23,8 @@ class Recipe(object):
         self.stemmer = SnowballStemmer("english")
         self.maxNgrams = 5
 
-        self.makeGraph()
+        self.graph = self.makeGraph()
+        # print pprint(self.graph)
 
     def probability(self):
         return 1
@@ -28,7 +32,6 @@ class Recipe(object):
     def makeGraph(self):
         new_file = open(self.filepath, 'r')
         all_list = pred.parse_predicate(new_file.read())
-
         counter = 1
         graphObject = []
         for item in all_list:
@@ -51,7 +54,8 @@ class Recipe(object):
             actionList = [actionName, action, objectList, actionResult]
             graphObject.append(actionList)
             counter += 1
-        print pprint(graphObject)
+
+        return graphObject
 
     def isFood(self, string):
         return self.isType(string, "food")
@@ -61,25 +65,35 @@ class Recipe(object):
 
     def isType(self, string, type):
         found = False
+        string = string.decode('ascii', 'ignore')
         if type == "food":
             itemList = self.foods
         elif type == "cookware":
             itemList = self.cookware
+
         text = word_tokenize(string)
         for n in reversed(range(1, self.maxNgrams+1)):
             for gram in ngrams(text, n):
                 potentialFood = " ".join(gram)
                 if len(potentialFood) > 1:
                     if potentialFood in itemList:
+                        # print potentialFood,
                         found = True
                         continue
                     if n == 1:
                         potentialFood = self.stemmer.stem(potentialFood)
                         if potentialFood in itemList:
                             found = True
+                            # print "stemmed",
                             continue
             if found:
+                # print potentialFood, type
                 return True
         return False
 
-Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt")
+    def __str__(self):
+        return "a recipe based on "+self.filepath
+
+
+amishMeatloaf = Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt")
+# print amishMeatloaf
