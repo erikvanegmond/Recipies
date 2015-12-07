@@ -193,4 +193,226 @@ aS'primus'
 p96
 aS'spirit stove'
 p97
+aS'chopstick'
+p98
+aS'crockery'
+p99
+aS'dishware'
+p100
+aS'cutlery'
+p101
+aS'eating utensil'
+p102
+aS'dinnerware'
+p103
+aS'flatware'
+p104
+aS'glassware'
+p105
+aS'glasswork'
+p106
+aS'gold plate'
+p107
+aS'service'
+p108
+aS'table service'
+p109
+aS'silver plate'
+p110
+aS'silverware'
+p111
+aS'tea service'
+p112
+aS'tea set'
+p113
+aS'chinaware'
+p114
+aS'china'
+p115
+aS'cup'
+p116
+aS'dish'
+p117
+aS'eggcup'
+p118
+aS'egg cup'
+p119
+aS'ovenware'
+p120
+aS'fork'
+p121
+aS'spoon'
+p122
+aS'spork'
+p123
+aS'table knife'
+p124
+aS'plate'
+p125
+aS'platter'
+p126
+aS'saucer'
+p127
+aS'crystal'
+p128
+aS'cut glass'
+p129
+aS'glass'
+p130
+aS'venetian glass'
+p131
+aS'dinner service'
+p132
+aS'dinner set'
+p133
+aS'place setting'
+p134
+aS'setting'
+p135
+aS'flatware'
+p136
+aS'silver'
+p137
+aS'hollowware'
+p138
+aS'holloware'
+p139
+aS'willowware'
+p140
+aS'willow-pattern'
+p141
+aS'beaker'
+p142
+aS'chalice'
+p143
+aS'goblet'
+p144
+aS'coffee cup'
+p145
+aS'dixie cup'
+p146
+aS'paper cup'
+p147
+aS'grace cup'
+p148
+aS'kylix'
+p149
+aS'cylix'
+p150
+aS'mustache cup'
+p151
+aS'moustache cup'
+p152
+aS'scyphus'
+p153
+aS'teacup'
+p154
+aS'bowl'
+p155
+aS'butter dish'
+p156
+aS'casserole'
+p157
+aS'coquille'
+p158
+aS'gravy boat'
+p159
+aS'gravy holder'
+p160
+aS'sauceboat'
+p161
+aS'boat'
+p162
+aS'petri dish'
+p163
+aS'ramekin'
+p164
+aS'ramequin'
+p165
+aS'serving dish'
+p166
+aS'sugar bowl'
+p167
+aS'watch glass'
+p168
+aS'carving fork'
+p169
+aS'salad fork'
+p170
+aS'tablefork'
+p171
+aS'toasting fork'
+p172
+aS'dessert spoon'
+p173
+aS'runcible spoon'
+p174
+aS'soupspoon'
+p175
+aS'soup spoon'
+p176
+aS'sugar spoon'
+p177
+aS'sugar shell'
+p178
+aS'tablespoon'
+p179
+aS'tea maker'
+p180
+aS'teaspoon'
+p181
+aS'wooden spoon'
+p182
+aS'butter knife'
+p183
+aS'case knife'
+p184
+aS'fish knife'
+p185
+aS'steak knife'
+p186
+aS'dessert plate'
+p187
+aS'dinner plate'
+p188
+aS'paper plate'
+p189
+aS'salad plate'
+p190
+aS'salad bowl'
+p191
+aS'soup plate'
+p192
+aS'steel plate'
+p193
+aS'demitasse'
+p194
+aS'cereal bowl'
+p195
+aS'finger bowl'
+p196
+aS'mixing bowl'
+p197
+aS'porringer'
+p198
+aS'punch bowl'
+p199
+aS'salad bowl'
+p200
+aS'slop basin'
+p201
+aS'slop bowl'
+p202
+aS'soup bowl'
+p203
+aS'cocotte'
+p204
+aS'argyll'
+p205
+aS'argyle'
+p206
+aS'tureen'
+p207
+aS'iced-tea spoon'
+p208
 a.

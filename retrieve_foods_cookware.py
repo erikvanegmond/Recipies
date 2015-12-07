@@ -10,6 +10,10 @@ for s in cookingStuff.closure(lambda s:s.hyponyms()):
 cookingStuff = wn.synset('kitchen_appliance.n.01')
 for s in cookingStuff.closure(lambda s:s.hyponyms()):
     cookingList +=  [str(lemma.name().replace("_", " ").lower())for lemma in s.lemmas()]
+
+cookingStuff = wn.synset('tableware.n.01')
+for s in cookingStuff.closure(lambda s:s.hyponyms()):
+    cookingList +=  [str(lemma.name().replace("_", " ").lower())for lemma in s.lemmas()]
 print cookingList
 
 
