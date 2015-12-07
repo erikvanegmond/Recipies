@@ -19,6 +19,7 @@ def parse_predicate(input_string):
     import re
 
     all_list = []
+    verb_list = []
     arguments_list = []
     predicate = []
     dobj = []
@@ -59,9 +60,10 @@ def parse_predicate(input_string):
 
     for j in range (0,len(predicate)):
         arguments_list = [dobj[j],parg[j],oarg[j]]
+        verb_list.append(predicate[j])
         tuple_pred = (predicate[j],arguments_list)
         all_list.append(tuple_pred)
-    return (all_list)
+    return (all_list, list(set(verb_list)))
 
 
 
