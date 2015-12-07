@@ -34,7 +34,7 @@ def parse_predicate(input_string):
             dobjs_per_verb = ''
             predicate.append(input_string[i].split(': ')[1])
         elif 'DOBJ' in input_string[i]:
-            dobjs_splitted = re.split('DOBJ: |, ', input_string[i])
+            dobjs_splitted = input_string[i][8:].split(",")#re.split('DOBJ: |, ', input_string[i])
             if dobjs_splitted[0] == '  ':
                 dobjs_per_verb = dobjs_splitted[1:]
             else:

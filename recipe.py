@@ -13,20 +13,26 @@ class Recipe(object):
 
     foods = None
     cookware = None
+    stemmer = None
 
     def __init__(self, filepath):
-        print "starting the recipe"
         self.filepath = filepath
-        print self.foods
-        pkl_file = open('foods.pkl', 'r')
-        self.foods = pickle.load(pkl_file)
-        pkl_file = open('cookware.pkl', 'r')
-        self.cookware = pickle.load(pkl_file)
-        self.stemmer = SnowballStemmer("english")
+        if not Recipe.foods:
+            pkl_file = open('foods.pkl', 'r')
+            Recipe.foods = set(pickle.load(pkl_file))
+            print "loaded Foods"
+        if not Recipe.cookware:
+            pkl_file = open('cookware.pkl', 'r')
+            Recipe.cookware = set(pickle.load(pkl_file))
+            print "loaded cookware"
+        if not Recipe.stemmer:
+            Recipe.stemmer = SnowballStemmer("english")
+            print "loaded stemmer"
         self.maxNgrams = 5
 
         self.graph = self.makeGraph()
         # print pprint(self.graph)
+
 
     def probability(self):
         return 1
@@ -36,6 +42,7 @@ class Recipe(object):
         (all_list, self.verb_list) = pred.parse_predicate(new_file.read())
         counter = 1
         graphObject = []
+        recipeIngredients = self.getIngredients()
         for item in all_list:
             actionName = "e"+str(counter)
             # print actionName,
@@ -45,8 +52,8 @@ class Recipe(object):
             for cookingObject in item[1]:
                 if type(cookingObject) is list:
                     for object in cookingObject[:2]:
-                        if self.isFood(object):
-                            # print object
+                        food = self.isFood(object)
+                        if food and food in recipeIngredients:
                             objectList.append([object, "food", "explicit"])
                         elif self.isCookware(object):
                             objectList.append([object, "location", "explicit"])
@@ -58,9 +65,27 @@ class Recipe(object):
             counter += 1
 
         return graphObject
-        
+
+    def getIngredients(self):
+        path = self.filepath.replace('chunked','fulltext')
+        with open(path, 'r'  ) as f:
+            recipe = f.read().replace("\n\n","\n").split("\n")
+        ingredients = []
+        ingBool = False
+        for line in recipe:
+            if line.startswith("Data Parsed"):
+                ingBool = False
+            food = self.isFood(line)
+            if ingBool and line and food:
+                ingredients.append(food)
+
+            if line == "Ingredients":
+                ingBool = True
+        return ingredients
+
     def makeConnections(self):
-        
+        pass
+        # print self.graph
 
     def isFood(self, string):
         return self.isType(string, "food")
@@ -80,22 +105,21 @@ class Recipe(object):
         for n in reversed(range(1, self.maxNgrams+1)):
             for gram in ngrams(text, n):
                 potentialFood = " ".join(gram)
+
                 if len(potentialFood) > 1:
                     if potentialFood in itemList:
-                        # print potentialFood,
                         found = True
-                        continue
+                        break
                     if n == 1:
                         potentialFood = self.stemmer.stem(potentialFood)
                         if potentialFood in itemList:
                             found = True
                             # print "stemmed",
-                            continue
+                            break
             if found:
-                # print potentialFood, type
-                return True
+                return potentialFood
         return False
-        
+
     def verbCounter(self):
         verb_count = {}
         verb_type = {}
@@ -108,7 +132,7 @@ class Recipe(object):
             verb_type[verb + "-1-food"] = 0
             verb_type[verb + "-2-food"] = 0
             verb_type[verb + "-2-location"] = 0
-            verb_type[verb + "-2-food-location"] = 0    
+            verb_type[verb + "-2-food-location"] = 0
         for k in range(0,len(count_list)):
             if len(count_list[k][2]) == 0:
                 verb_count[count_list[k][1] + "-0"] = verb_count[count_list[k][1] + "-0"] + 1
@@ -139,14 +163,23 @@ class Recipe(object):
                     verb_type[count_list[k][1] + "-2-food"] = verb_type[count_list[k][1] + "-2-food"] + 1
                 else:
                     continue
-        
+
         return  (verb_count, verb_type)
 
     def __str__(self):
         return "a recipe based on "+self.filepath
 
+    def static_vars(**kwargs):
+        def decorate(func):
+            for k in kwargs:
+                setattr(func, k, kwargs[k])
+            return func
+        return decorate
 
-amishMeatloaf = Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt")
-pprint(amishMeatloaf.graph)
-amishMeatloaf.verbCounter()
+
+# amishMeatloaf = Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt")
+# pprint(amishMeatloaf.graph)
+# amishMeatloaf.verbCounter()
+# amishMeatloaf.makeConnections()
+# amishMeatloaf.getIngredients()
 # print amishMeatloaf

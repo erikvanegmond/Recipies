@@ -13,6 +13,8 @@ from recipe import *
 rootdir = "..\AllRecipesData\chunked"
 recipeList =[]
 
+c = 0
+cmax = 200
 for subdir, dirs, files in os.walk(rootdir):
     for file in files:
         if file == ".DS_Store":
@@ -23,7 +25,12 @@ for subdir, dirs, files in os.walk(rootdir):
                 path = os.path.join(subdir, file)
                 print path
                 recipeList.append(Recipe(path))
-                break
+                c+=1
+                print c
+                if c > cmax:
+                    break
+    if c > cmax:
+        break
 
 
 global_verb_count = {}
@@ -40,11 +47,12 @@ for item in recipeList:
             global_verb_type[vc] = verb_type[vc]
         else:
             global_verb_type[vc] += verb_type[vc]
-            
 
+print global_verb_count
+print global_verb_type
 
-for item in recipeList:
-    item.makeConnections()
-print item, item.probability()
+# for item in recipeList:
+#     item.makeConnections()
+# print item, item.probability()
 
 
