@@ -241,7 +241,6 @@ class Recipe(object):
 
         return (verb_count, verb_type)
 
-
     def mostPobableArguments(self, verb, global_verb_count, global_verb_type):
         count_list = []
         argumentsTypesList = ["-1-location", "-1-food", "-2-food", "-2-location", "-2-food-location"]
@@ -278,7 +277,34 @@ class Recipe(object):
                         return self.graph[i][0]
         return False
 
+    def getIDfromAction(self, action):
+        return action[0]
 
+    def getVerbFromAction(self, action):
+        return action[1]
+
+    def getArgumentsFromAction(self, action):
+        return action[2]
+
+    def getActionResultFromAction(self, action):
+        return action[3]
+
+    def getSpanFromArgument(self, argument):
+        return argument[0]
+
+    def getSemanticTypeFromArgument(self, argument):
+        return argument[1]
+
+    def getSyntacticTypeFromArgument(self, argument):
+        return argument[2]
+
+    def getPlicitFromArgument(self, argument):
+        if len(argument) >= 4:
+            return argument[3]
+
+    def getOriginFromArgument(self, argment):
+        if len(argument) >= 5:
+            return argument[4]
 
     def __str__(self):
         return "a recipe based on "+self.filepath
