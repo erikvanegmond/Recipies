@@ -215,21 +215,20 @@ class Recipe(object):
             verb_sig_count[verb + "-DOBJ-false"] = 0
             verb_sig_count[verb + "-PARG-false"] = 0
         for action in self.graph:
-            for i in range(len(action[2])):
-                if action[2][i][2] == 'DOBJ':
-                    dobj = dobj+1
-                    if action[2][i][4] is not None:
-                        origin = origin + 1
-                elif action[2][i][2] == 'PARG':
-                    parg = parg+1
-                    if action[2][i][4] is not None:
-                        origin = origin + 1
-            verb_sig = getVerbSignature(dobj, parg, origin)
-            verb_sig_list.append(verb_sig)
-            verb_sig_count = countVerbSignature(action[1], dobj, parg, origin, verb_sig_count)
+            verb_sig = getVerbSignature(action)
+            countVerbSignature(action[1], verb_sig, verb_sig_count)
         return (verb_sig_list, verb_sig_count)
             
     def getVerbSignature(dobj, parg, origin):
+        for i in range(len(action[2])):
+                if getSyntacticTypeFromArgument(action) == 'DOBJ':
+                    dobj = dobj+1
+                    if getOriginFromArgument(action) is not None:
+                        origin = origin + 1
+                elif getSyntacticTypeFromArgument(action) == 'PARG':
+                    parg = parg+1
+                    if getOriginFromArgument(action) is not None:
+                        origin = origin + 1
         if dobj > 0 and parg > 0 and origin == 0:
             verb_sig = (['DOBJ', 'PARG'], True)
         elif dobj > 0 and parg == 0 and origin == 0:
@@ -244,25 +243,23 @@ class Recipe(object):
             verb_sig = (['PARG'], False)
         else:
             print 'no verb signature made'
-            continue
         return verb_sig
         
-    def countVerbSignature(verb, dobj, parg, origin, verb_sig_count):      
-        if dobj > 0 and parg > 0 and origin == 0:
+    def countVerbSignature(verb_sig_list, verb_sig_count):      
+        if verb_sig == (['DOBJ', 'PARG'], True):
             verb_sig_count[verb + "-DOBJPARG-true"] = verb_sig_count[verb + "-DOBJPARG-true"] + 1
-        elif dobj > 0 and parg == 0 and origin == 0:
+        elif verb_sig == (['DOBJ'], True):
             verb_sig_count[verb + "-DOBJ-true"] = verb_sig_count[verb + "-DOBJ-true"] + 1
-        elif dobj == 0 and parg > 0 and origin == 0:
+        elif verb_sig == (['PARG'], True):
             verb_sig_count[verb + "-PARG-true"] = verb_sig_count[verb + "-PARG-true"] + 1
-        elif dobj > 0 and parg > 0 and origin != 0 :
+        elif verb_sig == (['DOBJ', 'PARG'], False):
             verb_sig_count[verb + "-DOBJPARG-false"] = verb_sig_count[verb + "-DOBJPARG-false"] + 1
-        elif dobj > 0 and parg == 0 and origin != 0:
+        elif verb_sig == (['DOBJ'], False):
             verb_sig_count[verb + "-DOBJ-false"] = verb_sig_count[verb + "-DOBJ-false"] + 1
-        elif dobj == 0 and parg > 0 and origin != 0:
+        elif verb_sig == (['PARG'], False):
             verb_sig_count[verb + "-PARG-false"] = verb_sig_count[verb + "-PARG-false"] + 1
         else:
             print 'no verb signature counted'
-            continue
         return verb_sig_count
             
             
@@ -272,7 +269,6 @@ class Recipe(object):
     def verbCounter(self):
         verb_count = {}
         verb_type = {}
-        verb_signature = {}
         count_list = self.graph
         for verb in self.verb_list:
             verb_count[verb + "-0"] = 0
@@ -316,6 +312,7 @@ class Recipe(object):
                     continue
 
         return (verb_count, verb_type)
+            
 
     def mostPobableArguments(self, verb, global_verb_count, global_verb_type):
         count_list = []
@@ -401,13 +398,6 @@ class Recipe(object):
             return func
         return decorate
 
-
-#P(C) =prod{i} P(gi,vi) prod{i} prod{cp in di} P(o(cp)|d1...di1,c1...cp1,gi)
-# verbsignature: DOBJ,PP,both and Origin = 0 or not
-#P(R|C) = prod{i} P(vi|gi) prod{skij in Sij} funcsem(o,(part)ij) P(skij|syn,sem,C,hi)
-#When the argument is a food, and o != 0 : prod{k} P(skij|food(skij,C)) P(implicit|d(i,o))
-#When the argument is a food, and o = 0 : prod{l} (wl|rsw)
-#When the argument is a location : explicit :(loc(i),loc(o))   implicit :P(loc(o)|vi)
 
 amishMeatloaf = Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt")
 # pprint(amishMeatloaf.graph)
