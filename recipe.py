@@ -227,7 +227,7 @@ class Recipe(object):
             verb_sig = getVerbSignature(dobj, parg, origin)
             verb_sig_list.append(verb_sig)
             verb_sig_count = countVerbSignature(action[1], dobj, parg, origin, verb_sig_count)
-        return verb_sig
+        return (verb_sig_list, verb_sig_count)
             
     def getVerbSignature(dobj, parg, origin):
         if dobj > 0 and parg > 0 and origin == 0:
