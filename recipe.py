@@ -204,38 +204,39 @@ class Recipe(object):
             verb_type[verb + "-2-food"] = 0
             verb_type[verb + "-2-location"] = 0
             verb_type[verb + "-2-food-location"] = 0
-        for k in range(0,len(count_list)):
-            if len(count_list[k][2]) == 0:
-                verb_count[count_list[k][1] + "-0"] = verb_count[count_list[k][1] + "-0"] + 1
-            if len(count_list[k][2]) == 1:
-                verb_count[count_list[k][1] + "-1"] = verb_count[count_list[k][1] + "-1"] + 1
-                if count_list[k][2][0][1] == 'location':
-                    verb_type[count_list[k][1] + "-1-location"] = verb_type[count_list[k][1] + "-1-location"] + 1
-                if count_list[k][2][0][1] == 'food':
-                    verb_type[count_list[k][1] + "-1-food"] = verb_type[count_list[k][1] + "-1-food"] + 1
+        for action in count_list:
+            if len(action[2]) == 0:
+                verb_count[action[1] + "-0"] += 1
+            if len(action[2]) == 1:
+                verb_count[action[1] + "-1"] += 1
+                if action[2][0][1] == 'location':
+                    verb_type[action[1] + "-1-location"] += 1
+                if action[2][0][1] == 'food':
+                    verb_type[action[1] + "-1-food"] += 1
                 else:
                     continue
-            if len(count_list[k][2]) > 1:
+            if len(action[2]) > 1:
                 location = 0;
                 food = 0;
-                verb_count[count_list[k][1] + "-2"] = verb_count[count_list[k][1] + "-2"] + 1
-                for l in range(0,len(count_list[k][2])):
-                    if count_list[k][2][l][1] == 'location':
+                verb_count[action[1] + "-2"] += 1
+                for l in range(0,len(action[2])):
+                    if action[2][l][1] == 'location':
                         location = location + 1
-                    elif count_list[k][2][l][1] == 'food':
+                    elif action[2][l][1] == 'food':
                         food = food + 1
                     else:
                         continue
                 if location >= 1 and food >= 1:
-                    verb_type[count_list[k][1] + "-2-food-location"] = verb_type[count_list[k][1] + "-2-food-location"] + 1
+                    verb_type[action[1] + "-2-food-location"] += 1
                 if location >= 2 and food == 0:
-                    verb_type[count_list[k][1] + "-2-location"] = verb_type[count_list[k][1] + "-2-location"] + 1
+                    verb_type[action[1] + "-2-location"] += 1
                 if location == 0 and food >= 2:
-                    verb_type[count_list[k][1] + "-2-food"] = verb_type[count_list[k][1] + "-2-food"] + 1
+                    verb_type[action[1] + "-2-food"] += 1
                 else:
                     continue
 
         return  (verb_count, verb_type)
+
 
     def mostPobableArguments(self, verb, global_verb_count, global_verb_type):
         count_list = []
