@@ -115,49 +115,53 @@ class Recipe(object):
                         pass
                     else:
                         actionID = self.findPossibleConnection(i, "location", chosenConnections)
-                        chosenConnections.add(actionID)
-                        action[2].append(["?", "location", "impicit", actionID])
+                        if actionID:
+                            chosenConnections.add(actionID)
+                            action[2].append(["?", "location", "impicit", actionID])
 
                 elif argument == "-1-food":
                     if foodCount == 1 and locationCount == 0:
                         pass
                     else:
                         actionID = self.findPossibleConnection(i, "food", chosenConnections)
-                        chosenConnections.add(actionID)
-                        action[2].append(["?", "food", "impicit", actionID])
+                        if actionID:
+                            chosenConnections.add(actionID)
+                            action[2].append(["?", "food", "impicit", actionID])
                 elif argument == "-2-food":
                     if foodCount >= 2 and locationCount == 0:
                         pass
                     else:
                         for j in range(2-foodCount):
                             actionID = self.findPossibleConnection(i, "food", chosenConnections)
-                            chosenConnections.add(actionID)
-                            action[2].append(["?", "food", "impicit", actionID])
+                            if actionID:
+                                chosenConnections.add(actionID)
+                                action[2].append(["?", "food", "impicit", actionID])
                 elif argument == "-2-location":
                     if foodCount == 0 and locationCount >= 2:
                         pass
                     else:
                         for i in range(2-locationCount):
                             actionID = self.findPossibleConnection(i, "location", chosenConnections)
-                            chosenConnections.add(actionID)
-                            action[2].append(["?", "location", "impicit", actionID])
+                            if actionID:
+                                chosenConnections.add(actionID)
+                                action[2].append(["?", "location", "impicit", actionID])
                 elif argument == "-2-food-location":
                     if (foodCount >=2 and locationCount == 0) or (foodCount == 0 and locationCount >= 2) or (foodCount == 1 and locationCount == 1):
                         pass
                     else:
                         if foodCount == 0:
                             actionID = self.findPossibleConnection(i, "food", chosenConnections)
-                            chosenConnections.add(actionID)
-                            action[2].append(["?", "food", "impicit", actionID])
+                            if actionID:
+                                chosenConnections.add(actionID)
+                                action[2].append(["?", "food", "impicit", actionID])
                         if locationCount == 0:
                             actionID = self.findPossibleConnection(i, "location", chosenConnections)
-                            chosenConnections.add(actionID)
-                            action[2].append(["?", "location", "impicit", actionID])
-
+                            if actionID:
+                                chosenConnections.add(actionID)
+                                action[2].append(["?", "location", "impicit", actionID])
                 else:
                     "I don't recognize this argument!"
                 action[3] = self.determineActionResult(action[2])
-
 
     def isFood(self, string):
         return self.isType(string, "food")
@@ -235,7 +239,7 @@ class Recipe(object):
                 else:
                     continue
 
-        return  (verb_count, verb_type)
+        return (verb_count, verb_type)
 
 
     def mostPobableArguments(self, verb, global_verb_count, global_verb_type):
@@ -289,6 +293,7 @@ class Recipe(object):
 
 # amishMeatloaf = Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt")
 # pkl_file = open('globals.pkl', 'r')
+# # pprint(amishMeatloaf.graph)
 # global_verb_count = pickle.load(pkl_file)
 # global_verb_type = pickle.load(pkl_file)
 # amishMeatloaf.makeConnections(global_verb_count,global_verb_type)
