@@ -194,10 +194,79 @@ class Recipe(object):
             if found:
                 return potentialFood
         return False
+        
+    def getCountVerbSignature(self):
+        dobj = 0
+        parg = 0
+        origin = 0
+        verb_sig_count = {}
+        verb_sig_list = []
+        for verb in self.verb_list:
+            verb_sig_count[verb + "-DOBJPARG-true"] = 0
+            verb_sig_count[verb + "-DOBJ-true"] = 0
+            verb_sig_count[verb + "-PARG-true"] = 0
+            verb_sig_count[verb + "-DOBJPARG-false"] = 0
+            verb_sig_count[verb + "-DOBJ-false"] = 0
+            verb_sig_count[verb + "-PARG-false"] = 0
+        for action in self.graph:
+            for i in range(len(action[2])):
+                if action[2][i][2] == 'DOBJ':
+                    dobj = dobj+1
+                    if action[2][i][4] is not None:
+                        origin = origin + 1
+                elif action[2][i][2] == 'PARG':
+                    parg = parg+1
+                    if action[2][i][4] is not None:
+                        origin = origin + 1
+            verb_sig = getVerbSignature(dobj, parg, origin)
+            verb_sig_list.append(verb_sig)
+            verb_sig_count = countVerbSignature(action[1], dobj, parg, origin, verb_sig_count)
+        return verb_sig
+            
+    def getVerbSignature(dobj, parg, origin):
+        if dobj > 0 and parg > 0 and origin == 0:
+            verb_sig = (['DOBJ', 'PARG'], True)
+        elif dobj > 0 and parg == 0 and origin == 0:
+            verb_sig = (['DOBJ'], True)
+        elif dobj == 0 and parg > 0 and origin == 0:
+            verb_sig = (['PARG'], True)
+        elif dobj > 0 and parg > 0 and origin != 0 :
+            verb_sig = (['DOBJ', 'PARG'], True)
+        elif dobj > 0 and parg == 0 and origin != 0:
+            verb_sig = (['DOBJ'], True)
+        elif dobj == 0 and parg > 0 and origin != 0:
+            verb_sig = (['PARG'], True)
+        else:
+            print 'no verb signature made'
+            continue
+        return verb_sig
+        
+    def countVerbSignature(verb, dobj, parg, origin, verb_sig_count):      
+        if dobj > 0 and parg > 0 and origin == 0:
+            verb_sig_count[verb + "-DOBJPARG-true"] = verb_sig_count[verb + "-DOBJPARG-true"] + 1
+        elif dobj > 0 and parg == 0 and origin == 0:
+            verb_sig_count[verb + "-DOBJ-true"] = verb_sig_count[verb + "-DOBJ-true"] + 1
+        elif dobj == 0 and parg > 0 and origin == 0:
+            verb_sig_count[verb + "-PARG-true"] = verb_sig_count[verb + "-PARG-true"] + 1
+        elif dobj > 0 and parg > 0 and origin != 0 :
+            verb_sig_count[verb + "-DOBJPARG-false"] = verb_sig_count[verb + "-DOBJPARG-false"] + 1
+        elif dobj > 0 and parg == 0 and origin != 0:
+            verb_sig_count[verb + "-DOBJ-false"] = verb_sig_count[verb + "-DOBJ-false"] + 1
+        elif dobj == 0 and parg > 0 and origin != 0:
+            verb_sig_count[verb + "-PARG-false"] = verb_sig_count[verb + "-PARG-false"] + 1
+        else:
+            print 'no verb signature counted'
+            continue
+        return verb_sig_count
+            
+            
+            
+            
 
     def verbCounter(self):
         verb_count = {}
         verb_type = {}
+        verb_signature = {}
         count_list = self.graph
         for verb in self.verb_list:
             verb_count[verb + "-0"] = 0
