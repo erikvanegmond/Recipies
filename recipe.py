@@ -45,20 +45,25 @@ class Recipe(object):
         recipeIngredients = self.getIngredients()
         for item in all_list:
             actionName = "e"+str(counter)
-            # print actionName,
             action = item[0]
-            # print action,
             objectList = []
-            for cookingObject in item[1]:
+            for typeCounter, cookingObject in enumerate(item[1]):
+                if typeCounter == 0:
+                    syntacticType = "DOBJ"
+                elif typeCounter == 1:
+                    syntacticType =  "PARG"
+                else:
+                    syntacticType =  "OARG"
+
                 if type(cookingObject) is list:
                     for object in cookingObject[:2]:
                         food = self.isFood(object)
                         if food and food in recipeIngredients:
-                            objectList.append([object, "food", "explicit"])
+                            objectList.append([object, "food", syntacticType, "explicit"])
                         elif self.isCookware(object):
-                            objectList.append([object, "location", "explicit"])
+                            objectList.append([object, "location", syntacticType, "explicit"])
                         else:
-                            objectList.append([object, "?"])
+                            objectList.append([object, "?", syntacticType])
 
             actionResult = self.determineActionResult(objectList)
             actionList = [actionName, action, objectList, actionResult]
@@ -98,16 +103,16 @@ class Recipe(object):
         chosenConnections = set()
         for i, action in enumerate(self.graph):
             if i:
-                (foodCount, locationCount) = self.argumentTypes(action[2])
+                (foodCount, locationCount) = self.argumentTypes(self.getArgumentsFromAction(action))
                 if locationCount:
-                    for arg in action[2]:
-                        if arg[1] == "location":
-                            actionID = self.findPreviousMentionOfLocation(arg[0], i, chosenConnections)
+                    for arg in self.getArgumentsFromAction(action):
+                        if self.getSemanticTypeFromArgument(arg) == "location":
+                            actionID = self.findPreviousMentionOfLocation(self.getSpanFromArgument(arg), i, chosenConnections)
                             if actionID:
                                 chosenConnections.add(actionID)
                                 arg.append(actionID)
 
-                verb = action[1]
+                verb = self.getVerbFromAction(action)
                 argument = self.mostPobableArguments(verb, global_verb_count, global_verb_type)
 
                 if argument == "-1-location":
@@ -117,7 +122,7 @@ class Recipe(object):
                         actionID = self.findPossibleConnection(i, "location", chosenConnections)
                         if actionID:
                             chosenConnections.add(actionID)
-                            action[2].append(["?", "location", "impicit", actionID])
+                            self.addArgumentToAction(action, ["?", "location", "impicit", actionID])
 
                 elif argument == "-1-food":
                     if foodCount == 1 and locationCount == 0:
@@ -126,7 +131,7 @@ class Recipe(object):
                         actionID = self.findPossibleConnection(i, "food", chosenConnections)
                         if actionID:
                             chosenConnections.add(actionID)
-                            action[2].append(["?", "food", "impicit", actionID])
+                            self.addArgumentToAction(action, ["?", "food", "impicit", actionID])
                 elif argument == "-2-food":
                     if foodCount >= 2 and locationCount == 0:
                         pass
@@ -135,7 +140,7 @@ class Recipe(object):
                             actionID = self.findPossibleConnection(i, "food", chosenConnections)
                             if actionID:
                                 chosenConnections.add(actionID)
-                                action[2].append(["?", "food", "impicit", actionID])
+                                self.addArgumentToAction(action, ["?", "food", "impicit", actionID])
                 elif argument == "-2-location":
                     if foodCount == 0 and locationCount >= 2:
                         pass
@@ -144,7 +149,7 @@ class Recipe(object):
                             actionID = self.findPossibleConnection(i, "location", chosenConnections)
                             if actionID:
                                 chosenConnections.add(actionID)
-                                action[2].append(["?", "location", "impicit", actionID])
+                                self.addArgumentToAction(action, ["?", "location", "impicit", actionID])
                 elif argument == "-2-food-location":
                     if (foodCount >=2 and locationCount == 0) or (foodCount == 0 and locationCount >= 2) or (foodCount == 1 and locationCount == 1):
                         pass
@@ -153,15 +158,16 @@ class Recipe(object):
                             actionID = self.findPossibleConnection(i, "food", chosenConnections)
                             if actionID:
                                 chosenConnections.add(actionID)
-                                action[2].append(["?", "food", "impicit", actionID])
+                                self.addArgumentToAction(action, ["?", "food", "impicit", actionID])
                         if locationCount == 0:
                             actionID = self.findPossibleConnection(i, "location", chosenConnections)
                             if actionID:
                                 chosenConnections.add(actionID)
-                                action[2].append(["?", "location", "impicit", actionID])
+                                self.addArgumentToAction(action, ["?", "location", "impicit", actionID])
                 else:
                     "I don't recognize this argument!"
-                action[3] = self.determineActionResult(action[2])
+                self.setActionResultFromAction(action, self.determineActionResult(self.getArgumentsFromAction(action)))
+
 
     def isFood(self, string):
         return self.isType(string, "food")
@@ -278,38 +284,38 @@ class Recipe(object):
             verb_type[verb + "-2-location"] = 0
             verb_type[verb + "-2-food-location"] = 0
         for action in count_list:
-            if len(action[2]) == 0:
-                verb_count[action[1] + "-0"] += 1
-            if len(action[2]) == 1:
-                verb_count[action[1] + "-1"] += 1
-                if action[2][0][1] == 'location':
-                    verb_type[action[1] + "-1-location"] += 1
-                if action[2][0][1] == 'food':
-                    verb_type[action[1] + "-1-food"] += 1
+            if len(self.getArgumentsFromAction(action)) == 0:
+                verb_count[self.getVerbFromAction(action) + "-0"] += 1
+            if len(self.getArgumentsFromAction(action)) == 1:
+                verb_count[self.getVerbFromAction(action) + "-1"] += 1
+                fistArguent = self.getArgumentsFromAction(action)[0]
+                if self.getSemanticTypeFromArgument(fistArguent) == 'location':
+                    verb_type[self.getVerbFromAction(action) + "-1-location"] += 1
+                if self.getSemanticTypeFromArgument(fistArguent) == 'food':
+                    verb_type[self.getVerbFromAction(action) + "-1-food"] += 1
                 else:
                     continue
-            if len(action[2]) > 1:
+            if len(self.getArgumentsFromAction(action)) > 1:
                 location = 0;
                 food = 0;
-                verb_count[action[1] + "-2"] += 1
-                for l in range(0,len(action[2])):
-                    if action[2][l][1] == 'location':
+                verb_count[self.getVerbFromAction(action) + "-2"] += 1
+                for arg in self.getArgumentsFromAction(action):
+                    if self.getSemanticTypeFromArgument(arg) == 'location':
                         location = location + 1
-                    elif action[2][l][1] == 'food':
+                    elif self.getSemanticTypeFromArgument(arg) == 'food':
                         food = food + 1
                     else:
                         continue
                 if location >= 1 and food >= 1:
-                    verb_type[action[1] + "-2-food-location"] += 1
+                    verb_type[self.getVerbFromAction(action) + "-2-food-location"] += 1
                 if location >= 2 and food == 0:
-                    verb_type[action[1] + "-2-location"] += 1
+                    verb_type[self.getVerbFromAction(action) + "-2-location"] += 1
                 if location == 0 and food >= 2:
-                    verb_type[action[1] + "-2-food"] += 1
+                    verb_type[self.getVerbFromAction(action) + "-2-food"] += 1
                 else:
                     continue
 
         return (verb_count, verb_type)
-
 
     def mostPobableArguments(self, verb, global_verb_count, global_verb_type):
         count_list = []
@@ -326,28 +332,64 @@ class Recipe(object):
         food = 0
         location = 0
         for arg in action:
-            if arg[1] == "food":
+            if self.getSemanticTypeFromArgument(arg) == "food":
                 food +=1
-            elif arg[1] == "location":
+            elif self.getSemanticTypeFromArgument(arg) == "location":
                 location +=1
         return (food, location)
 
     def findPossibleConnection(self, actionIndex, type, disallowedConnections):
         for i in reversed(range(actionIndex)):
-            if self.graph[i][3] == type and not self.graph[i][0] in disallowedConnections:
-                return self.graph[i][0]
+            action = self.graph[i]
+            argument = self.getArgumentsFromAction(action)
+            if self.getActionResultFromAction(action) == type and not self.getIDfromAction(action) in disallowedConnections:
+                return self.getIDfromAction(action)
 
     def findPreviousMentionOfLocation(self, location, actionIndex, disallowedConnections):
         recognizedLocation = self.isCookware(location)
         for i in reversed(range(actionIndex)):
-            # print "   ",self.graph[i]
-            for arg in self.graph[i][2]:
-                if arg[1] == "location":
-                    if recognizedLocation == self.isCookware(arg[0]) and not self.graph[i][0] in disallowedConnections:
-                        return self.graph[i][0]
+            action = self.graph[i]
+            for arg in self.getArgumentsFromAction(action):
+                if self.getSemanticTypeFromArgument(arg) == "location":
+                    if recognizedLocation == self.isCookware(self.getSpanFromArgument(arg)) and not self.getIDfromAction(action) in disallowedConnections:
+                        return self.getIDfromAction(action)
         return False
 
+    def addArgumentToAction(self, action, list):
+        arguments = self.getArgumentsFromAction(action)
+        arguments.append(list)
 
+    def getIDfromAction(self, action):
+        return action[0]
+
+    def getVerbFromAction(self, action):
+        return action[1]
+
+    def getArgumentsFromAction(self, action):
+        return action[2]
+
+    def getActionResultFromAction(self, action):
+        return action[3]
+
+    def setActionResultFromAction(self, action, value):
+        action[3] = value
+
+    def getSpanFromArgument(self, argument):
+        return argument[0]
+
+    def getSemanticTypeFromArgument(self, argument):
+        return argument[1]
+
+    def getSyntacticTypeFromArgument(self, argument):
+        return argument[2]
+
+    def getPlicitFromArgument(self, argument):
+        if len(argument) >= 4:
+            return argument[3]
+
+    def getOriginFromArgument(self, argment):
+        if len(argument) >= 5:
+            return argument[4]
 
     def __str__(self):
         return "a recipe based on "+self.filepath
@@ -367,13 +409,15 @@ class Recipe(object):
 #When the argument is a food, and o = 0 : prod{l} (wl|rsw)
 #When the argument is a location : explicit :(loc(i),loc(o))   implicit :P(loc(o)|vi)
 
-# amishMeatloaf = Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt")
-# pkl_file = open('globals.pkl', 'r')
-# # pprint(amishMeatloaf.graph)
-# global_verb_count = pickle.load(pkl_file)
-# global_verb_type = pickle.load(pkl_file)
-# amishMeatloaf.makeConnections(global_verb_count,global_verb_type)
+amishMeatloaf = Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt")
 # pprint(amishMeatloaf.graph)
+pkl_file = open('globals.pkl', 'r')
+global_verb_count = pickle.load(pkl_file)
+global_verb_type = pickle.load(pkl_file)
+amishMeatloaf.makeConnections(global_verb_count,global_verb_type)
+pprint(amishMeatloaf.graph)
 
+
+# print amishMeatloaf.verbCounter()
 # amishMeatloaf.getIngredients()
 # print amishMeatloaf
