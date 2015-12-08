@@ -202,9 +202,6 @@ class Recipe(object):
         return False
         
     def getCountVerbSignature(self):
-        dobj = 0
-        parg = 0
-        origin = 0
         verb_sig_count = {}
         verb_sig_list = []
         for verb in self.verb_list:
@@ -215,19 +212,23 @@ class Recipe(object):
             verb_sig_count[verb + "-DOBJ-false"] = 0
             verb_sig_count[verb + "-PARG-false"] = 0
         for action in self.graph:
-            verb_sig = getVerbSignature(action)
-            countVerbSignature(action[1], verb_sig, verb_sig_count)
+            verb_sig = self.getVerbSignature(action)
+            verb_sig_list.append(verb_sig)
+            self.countVerbSignature(self.getVerbFromAction(action), verb_sig, verb_sig_count)
         return (verb_sig_list, verb_sig_count)
             
-    def getVerbSignature(dobj, parg, origin):
-        for i in range(len(action[2])):
-                if getSyntacticTypeFromArgument(action) == 'DOBJ':
+    def getVerbSignature(self, action):
+        dobj = 0
+        parg = 0
+        origin = 0
+        for argument in self.getArgumentsFromAction(action):
+                if self.getSyntacticTypeFromArgument(argument) == 'DOBJ':
                     dobj = dobj+1
-                    if getOriginFromArgument(action) is not None:
+                    if self.getOriginFromArgument(argument) is not None:
                         origin = origin + 1
-                elif getSyntacticTypeFromArgument(action) == 'PARG':
+                elif self.getSyntacticTypeFromArgument(argument) == 'PARG':
                     parg = parg+1
-                    if getOriginFromArgument(action) is not None:
+                    if self.getOriginFromArgument(argument) is not None:
                         origin = origin + 1
         if dobj > 0 and parg > 0 and origin == 0:
             verb_sig = (['DOBJ', 'PARG'], True)
@@ -245,24 +246,9 @@ class Recipe(object):
             print 'no verb signature made'
         return verb_sig
         
-    def countVerbSignature(verb_sig_list, verb_sig_count):      
-        if verb_sig == (['DOBJ', 'PARG'], True):
-            verb_sig_count[verb + "-DOBJPARG-true"] = verb_sig_count[verb + "-DOBJPARG-true"] + 1
-        elif verb_sig == (['DOBJ'], True):
-            verb_sig_count[verb + "-DOBJ-true"] = verb_sig_count[verb + "-DOBJ-true"] + 1
-        elif verb_sig == (['PARG'], True):
-            verb_sig_count[verb + "-PARG-true"] = verb_sig_count[verb + "-PARG-true"] + 1
-        elif verb_sig == (['DOBJ', 'PARG'], False):
-            verb_sig_count[verb + "-DOBJPARG-false"] = verb_sig_count[verb + "-DOBJPARG-false"] + 1
-        elif verb_sig == (['DOBJ'], False):
-            verb_sig_count[verb + "-DOBJ-false"] = verb_sig_count[verb + "-DOBJ-false"] + 1
-        elif verb_sig == (['PARG'], False):
-            verb_sig_count[verb + "-PARG-false"] = verb_sig_count[verb + "-PARG-false"] + 1
-        else:
-            print 'no verb signature counted'
-        return verb_sig_count
-            
-            
+    def countVerbSignature(self, verb, verb_sig, verb_sig_count):
+        flag = "true" if verb_sig[1] else "false" 
+        verb_sig_count[verb + "-"  + "".join(verb_sig[0]) + "-" + flag] += 1 
             
             
 
@@ -384,7 +370,7 @@ class Recipe(object):
         if len(argument) >= 4:
             return argument[3]
 
-    def getOriginFromArgument(self, argment):
+    def getOriginFromArgument(self, argument):
         if len(argument) >= 5:
             return argument[4]
 
@@ -406,6 +392,7 @@ global_verb_count = pickle.load(pkl_file)
 global_verb_type = pickle.load(pkl_file)
 amishMeatloaf.makeConnections(global_verb_count,global_verb_type)
 pprint(amishMeatloaf.graph)
+print amishMeatloaf.getCountVerbSignature()
 
 
 # print amishMeatloaf.verbCounter()
