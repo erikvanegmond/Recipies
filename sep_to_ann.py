@@ -59,9 +59,11 @@ pkl_file = open('globals.pkl', 'r')
 global_verb_count = pickle.load(pkl_file)
 global_verb_type = pickle.load(pkl_file)
 
+# recipeList[0].makeConnections(global_verb_count,global_verb_type)
+# pprint(recipeList[0].graph)
 for item in recipeList:
     item.makeConnections(global_verb_count,global_verb_type)
     pprint( item.graph )
-# print item, item.probability()
+print item, item.probability()
 
 
