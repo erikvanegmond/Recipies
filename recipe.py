@@ -298,7 +298,50 @@ class Recipe(object):
                     continue
 
         return (verb_count, verb_type)
-            
+        
+
+    def connectionCounter(self):
+        connection_count = {}
+        connec_verb_sig_count = {}
+        
+        for action in self.graph:
+            arguments = self.getArgumentsFromAction(action)
+            for argnum, argument in enumerate(arguments):
+                origin = self.getOriginFromArgument(argument)
+                if origin:
+                    key = str(self.getIDfromAction(action)) + "-" + str(self.getOriginFromArgument(argument)))
+                    
+                    if key in connection_count:
+                        connection_count[key] += 1
+                    else:
+                        connection_count[key] = 1
+                    # print str(self.getIDfromAction(action)) + "-" + str(self.getOriginFromArgument(argument)) + "-" + str(argnum) + "-" + str(self.getSyntacticTypeFromArgument(argument) +"-" + str(self.getSemanticTypeFromArgument(argument)))
+
+            # if 
+    
+            #     else:
+            #         continue
+            # if len(action[2]) > 1:
+            #     location = 0;
+            #     food = 0;
+            #     verb_count[action[1] + "-2"] += 1
+            #     for l in range(0,len(action[2])):
+            #         if action[2][l][1] == 'location':
+            #             location = location + 1
+            #         elif action[2][l][1] == 'food':
+            #             food = food + 1
+            #         else:
+            #             continue
+            #     if location >= 1 and food >= 1:
+            #         verb_type[action[1] + "-2-food-location"] += 1
+            #     if location >= 2 and food == 0:
+            #         verb_type[action[1] + "-2-location"] += 1
+            #     if location == 0 and food >= 2:
+            #         verb_type[action[1] + "-2-food"] += 1
+            #     else:
+            #         continue
+
+        return (connection_count)    
 
     def mostPobableArguments(self, verb, global_verb_count, global_verb_type):
         count_list = []
