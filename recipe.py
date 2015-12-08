@@ -237,11 +237,11 @@ class Recipe(object):
         elif dobj == 0 and parg > 0 and origin == 0:
             verb_sig = (['PARG'], True)
         elif dobj > 0 and parg > 0 and origin != 0 :
-            verb_sig = (['DOBJ', 'PARG'], True)
+            verb_sig = (['DOBJ', 'PARG'], False)
         elif dobj > 0 and parg == 0 and origin != 0:
-            verb_sig = (['DOBJ'], True)
+            verb_sig = (['DOBJ'], False)
         elif dobj == 0 and parg > 0 and origin != 0:
-            verb_sig = (['PARG'], True)
+            verb_sig = (['PARG'], False)
         else:
             print 'no verb signature made'
             continue
