@@ -283,13 +283,13 @@ class Recipe(object):
         verb_sig_count = {}
         verb_sig_list = []
         for verb in self.verb_list:
-            verb_sig_count[verb + "-DOBJPARG-true"] = 0.1
-            verb_sig_count[verb + "-DOBJ-true"] = 0.1
-            verb_sig_count[verb + "-PARG-true"] = 0.1
-            verb_sig_count[verb + "-DOBJPARG-false"] = 0.1
-            verb_sig_count[verb + "-DOBJ-false"] = 0.1
-            verb_sig_count[verb + "-PARG-false"] = 0.1
-            verb_sig_count[verb + "--false"] = 0.1
+            verb_sig_count[verb + "-DOBJPARG-true"] = 0
+            verb_sig_count[verb + "-DOBJ-true"] = 0
+            verb_sig_count[verb + "-PARG-true"] = 0
+            verb_sig_count[verb + "-DOBJPARG-false"] = 0
+            verb_sig_count[verb + "-DOBJ-false"] = 0
+            verb_sig_count[verb + "-PARG-false"] = 0
+            verb_sig_count[verb + "--false"] = 0
         for action in self.graph:
             verb_sig = self.getVerbSignature(action)
             verb_sig_list.append(verb_sig)
