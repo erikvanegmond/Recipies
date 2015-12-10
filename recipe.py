@@ -211,6 +211,7 @@ class Recipe(object):
             verb_sig_count[verb + "-DOBJPARG-false"] = 0
             verb_sig_count[verb + "-DOBJ-false"] = 0
             verb_sig_count[verb + "-PARG-false"] = 0
+            verb_sig_count[verb + "--false"] = 0
         for action in self.graph:
             verb_sig = self.getVerbSignature(action)
             verb_sig_list.append(verb_sig)
@@ -244,6 +245,7 @@ class Recipe(object):
             verb_sig = (['PARG'], False)
         else:
             print 'no verb signature made'
+            verb_sig = ([],0)
         return verb_sig
         
     def countVerbSignature(self, verb, verb_sig, verb_sig_count):
@@ -257,6 +259,7 @@ class Recipe(object):
         verb_type = {}
         count_list = self.graph
         for verb in self.verb_list:
+            print "verbcounter" + verb
             verb_count[verb + "-0"] = 0
             verb_count[verb + "-1"] = 0
             verb_count[verb + "-2"] = 0
@@ -296,13 +299,14 @@ class Recipe(object):
                     verb_type[self.getVerbFromAction(action) + "-2-food"] += 1
                 else:
                     continue
-
         return (verb_count, verb_type)
             
 
     def mostPobableArguments(self, verb, global_verb_count, global_verb_type):
         count_list = []
         argumentsTypesList = ["-1-location", "-1-food", "-2-food", "-2-location", "-2-food-location"]
+        print global_verb_type
+        print verb
         count_list.append( global_verb_type[verb + "-1-location"] )
         count_list.append( global_verb_type[verb + "-1-food"])
         count_list.append( global_verb_type[verb + "-2-food"])
@@ -310,6 +314,8 @@ class Recipe(object):
         count_list.append( global_verb_type[verb + "-2-food-location"])
         # print count_list.index(max(count_list))
         return argumentsTypesList[count_list.index(max(count_list))]
+        
+    #def evaluate:
 
     def argumentTypes(self, action):
         food = 0
@@ -390,9 +396,10 @@ amishMeatloaf = Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish
 pkl_file = open('globals.pkl', 'r')
 global_verb_count = pickle.load(pkl_file)
 global_verb_type = pickle.load(pkl_file)
-amishMeatloaf.makeConnections(global_verb_count,global_verb_type)
-pprint(amishMeatloaf.graph)
-print amishMeatloaf.getCountVerbSignature()
+global_verb_sig_count = pickle.load(pkl_file)
+#amishMeatloaf.makeConnections(global_verb_count,global_verb_type)
+#pprint(amishMeatloaf.graph)
+#amishMeatloaf.getCountVerbSignature()
 
 
 # print amishMeatloaf.verbCounter()
