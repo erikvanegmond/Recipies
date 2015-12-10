@@ -1,12 +1,11 @@
 import pickle
 import pred as pred
-import pprint
 import numpy as np
 from nltk import word_tokenize
 from nltk.stem.snowball import SnowballStemmer
 from nltk.util import ngrams
 from pprint import *
-
+from copy import deepcopy
 
 class Recipe(object):
     """docstring for Recipe"""
@@ -56,7 +55,7 @@ class Recipe(object):
 
                 if type(cookingObject) is list:
                     for object in cookingObject[:2]:
-                        food = self.isFood(object)
+                        food = self.is_food(object)
                         if food and food in recipeIngredients:
                             objectList.append([object, "food", syntacticType, "explicit"])
                         elif self.isCookware(object):
@@ -90,7 +89,7 @@ class Recipe(object):
         for line in recipe:
             if line.startswith("Data Parsed"):
                 ingBool = False
-            food = self.isFood(line)
+            food = self.is_food(line)
             if ingBool and line and food:
                 ingredients.append(food)
 
@@ -227,8 +226,25 @@ class Recipe(object):
             self.addArgumentToAction(destinationAction, ["?", need, "?", "implicit", origin])
 
     def change_connection(self):
-
+        new_graph = self.copy_graph()
+        self.find_possible_swaps(new_graph)
+        # self.swap_connection(new_graph)
         pass
+
+    def find_possible_swaps(self, graph):
+        self.list_connections(graph)
+
+    def list_connections(self, graph):
+        for action in self.graph:
+            arguments = self.getArgumentsFromAction(action)
+            for argnum, argument in enumerate(arguments):
+                origin = self.getOriginFromArgument(argument)
+                if origin:
+                    print origin, self.getIDfromAction(action)
+
+    def swap_connection(self, graph):
+        print "hi"
+
 
     def getProbabilitiesForPossibleActions(self, need, haveFood, haveLocation, argumentTypeCount):
         argumentsTypesList = ["-1-location", "-1-food", "-2-food", "-2-location", "-2-food-location"]
@@ -245,7 +261,7 @@ class Recipe(object):
         else:
             return 0
 
-    def isFood(self, string):
+    def is_food(self, string):
         return self.isType(string, "food")
 
     def isCookware(self, string):
@@ -377,7 +393,7 @@ class Recipe(object):
                     continue
         return (verb_count, verb_type)
 
-    def connectionCounter(self):
+    def connection_counter(self):
         connection_count = {}
         connec_verb_sig_count = {}
 
@@ -466,7 +482,7 @@ class Recipe(object):
         return key_value_list_dict
 
     def sigConnectionProbability(global_connection_verb_sig_count):
-        
+        pass
         
                             
     def getArgumentsCountList(self, verb, global_verb_type):
@@ -556,7 +572,8 @@ class Recipe(object):
 
 
     def copy_graph(self):
-        new_graph = self.graph.copy()
+        new_graph = deepcopy(self.graph)
+        return new_graph
 
     def __str__(self):
         return "a recipe based on "+self.filepath
@@ -566,18 +583,18 @@ amishMeatloaf = Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish
 pkl_file = open('globals.pkl', 'r')
 global_verb_count = pickle.load(pkl_file)
 global_verb_type = pickle.load(pkl_file)
-
-global_verb_sig_count = pickle.load(pkl_file)
-
-for key in global_verb_sig_count:
-    global_verb_sig_count[key] += 0.1
+#
+# global_verb_sig_count = pickle.load(pkl_file)
+#
+# for key in global_verb_sig_count:
+#     global_verb_sig_count[key] += 0.1
 amishMeatloaf.makeConnections(global_verb_count,global_verb_type)
-#(_,global_verb_sig_count) = amishMeatloaf.getCountVerbSignature()
-pprint(amishMeatloaf.graph)
-#amishMeatloaf.getCountVerbSignature()
-amishMeatloaf.evaluateGraph(global_verb_sig_count, global_connection_verb_sig_count)
-(connection_count, connec_verb_sig_count) = amishMeatloaf.connectionCounter()
-
+# #(_,global_verb_sig_count) = amishMeatloaf.getCountVerbSignature()
+# pprint(amishMeatloaf.graph)
+# #amishMeatloaf.getCountVerbSignature()
+# amishMeatloaf.evaluateGraph(global_verb_sig_count, global_connection_verb_sig_count)
+# (connection_count, connec_verb_sig_count) = amishMeatloaf.connectionCounter()
+amishMeatloaf.change_connection()
 
 
 # print amishMeatloaf.verbCounter()
