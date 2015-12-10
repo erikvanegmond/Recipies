@@ -415,7 +415,7 @@ class Recipe(object):
         # print count_list.index(max(count_list))
         return argumentsTypesList[count_list.index(max(count_list))]
 
-    def evaluateGraph(self, global_verb_count, global_verb_type, global_verb_sig_count):
+    def evaluateGraph(self, global_verb_sig_count, global_connection_verb_sig_count):
         self.calculatePriorProbability(global_verb_sig_count)
 
     def getProbabilitiesForArguments(self, verb, global_verb_count, global_verb_type):
@@ -423,11 +423,11 @@ class Recipe(object):
         countSum = float(sum(count_list))
         for i, count in enumerate(count_list):
             count_list[i] = count/countSum
-        print verb, count_list
 
-    def calculatePriorProbability(self, global_verb_sig_count):
+    def calculatePriorProbability(self, global_verb_sig_count, global_connection_verb_sig_count):
         sig_verb_prob_prod = self.signatureGivenVerbProbability(global_verb_sig_count)
         #print sig_verb_prob_prod
+        self.sigConnectionProbability(global_connection_verb_sig_count)
 
     def signatureGivenVerbProbability(self,global_verb_sig_count):
         graph = self.graph
@@ -443,14 +443,13 @@ class Recipe(object):
                 if origin:
 
                     verb_sig = self.getVerbSignature(action)
-                    print action
                     sig_verb_str =  self.verbSignatureToString(verb_sig)
                     sig_verb_prob_one = key_value_list_dict[verb + "-" + sig_verb_str]
          #           if not sig_verb_prob_one:
          #               print verb + "-" + sig_verb_str
             probabilities_list.append(sig_verb_prob_one)
-        sig_verb_prob_prod = np.prod(probabilities_list)
         print probabilities_list
+        sig_verb_prob_prod = np.prod(probabilities_list)
         return sig_verb_prob_prod
 
     def calculateVerbSignatureProbabilitiesPerVerb(self, global_verb_sig_count, verb):
@@ -463,9 +462,13 @@ class Recipe(object):
             value = key_value[1]
             key_value_list_dict[key] = value
 
-        #print key_value_list_dict
+        print key_value_list_dict
         return key_value_list_dict
 
+    def sigConnectionProbability(global_connection_verb_sig_count):
+        
+        
+                            
     def getArgumentsCountList(self, verb, global_verb_type):
         count_list = []
         argumentsTypesList = ["-1-location", "-1-food", "-2-food", "-2-location", "-2-food-location"]
@@ -565,11 +568,15 @@ global_verb_count = pickle.load(pkl_file)
 global_verb_type = pickle.load(pkl_file)
 
 global_verb_sig_count = pickle.load(pkl_file)
+
+for key in global_verb_sig_count:
+    global_verb_sig_count[key] += 0.1
 amishMeatloaf.makeConnections(global_verb_count,global_verb_type)
-(_,global_verb_sig_count) = amishMeatloaf.getCountVerbSignature()
+#(_,global_verb_sig_count) = amishMeatloaf.getCountVerbSignature()
 pprint(amishMeatloaf.graph)
 #amishMeatloaf.getCountVerbSignature()
-amishMeatloaf.evaluateGraph(global_verb_count,global_verb_type, global_verb_sig_count)
+amishMeatloaf.evaluateGraph(global_verb_sig_count, global_connection_verb_sig_count)
+(connection_count, connec_verb_sig_count) = amishMeatloaf.connectionCounter()
 
 
 

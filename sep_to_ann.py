@@ -34,7 +34,7 @@ cmax = 20000
 #     if c > cmax:
 #         break
 
-
+'''
 # output = open('globals.pkl', 'wb')
 
 # global_verb_count = {}
@@ -81,7 +81,7 @@ cmax = 20000
 # pickle.dump(global_connection_count, output)
 # pickle.dump(global_connection_verb_sig_count, output)
 # output.close()
-
+'''
 
 pkl_file = open('globals.pkl', 'r')
 global_verb_count = pickle.load(pkl_file)
@@ -92,8 +92,8 @@ global_connection_verb_sig_count = pickle.load(pkl_file)
 pkl_file.close()
 
 for key in global_verb_signature:
-    global_verb_signature[key] += float(0.1)
-
+    global_verb_signature[key] += 0.1
+    print global_verb_signature[key]
 
 # recipeList[0].makeConnections(global_verb_count,global_verb_type)
 # pprint(recipeList[0].graph)
