@@ -1,6 +1,7 @@
 import pickle
 import pred as pred
 import pprint
+import numpy as np
 from nltk import word_tokenize
 from nltk.stem.snowball import SnowballStemmer
 from nltk.util import ngrams
@@ -205,13 +206,13 @@ class Recipe(object):
         verb_sig_count = {}
         verb_sig_list = []
         for verb in self.verb_list:
-            verb_sig_count[verb + "-DOBJPARG-true"] = 0
-            verb_sig_count[verb + "-DOBJ-true"] = 0
-            verb_sig_count[verb + "-PARG-true"] = 0
-            verb_sig_count[verb + "-DOBJPARG-false"] = 0
-            verb_sig_count[verb + "-DOBJ-false"] = 0
-            verb_sig_count[verb + "-PARG-false"] = 0
-            verb_sig_count[verb + "--false"] = 0
+            verb_sig_count[verb + "-DOBJPARG-true"] = 0.1
+            verb_sig_count[verb + "-DOBJ-true"] = 0.1
+            verb_sig_count[verb + "-PARG-true"] = 0.1
+            verb_sig_count[verb + "-DOBJPARG-false"] = 0.1
+            verb_sig_count[verb + "-DOBJ-false"] = 0.1
+            verb_sig_count[verb + "-PARG-false"] = 0.1
+            verb_sig_count[verb + "--false"] = 0.1
         for action in self.graph:
             verb_sig = self.getVerbSignature(action)
             verb_sig_list.append(verb_sig)
@@ -261,7 +262,6 @@ class Recipe(object):
         verb_type = {}
         count_list = self.graph
         for verb in self.verb_list:
-            print "verbcounter" + verb
             verb_count[verb + "-0"] = 0
             verb_count[verb + "-1"] = 0
             verb_count[verb + "-2"] = 0
@@ -334,8 +334,6 @@ class Recipe(object):
     def mostPobableArguments(self, verb, global_verb_count, global_verb_type):
         count_list = []
         argumentsTypesList = ["-1-location", "-1-food", "-2-food", "-2-location", "-2-food-location"]
-        print global_verb_type
-        print verb
         count_list.append( global_verb_type[verb + "-1-location"] )
         count_list.append( global_verb_type[verb + "-1-food"])
         count_list.append( global_verb_type[verb + "-2-food"])
@@ -344,8 +342,57 @@ class Recipe(object):
         # print count_list.index(max(count_list))
         return argumentsTypesList[count_list.index(max(count_list))]
         
-    #def evaluate:
+    def evaluateGraph(self, global_verb_count, global_verb_type, global_verb_sig_count):
+        self.calculatePriorProbability(global_verb_sig_count)        
 
+
+    
+    def calculatePriorProbability(self, global_verb_sig_count):
+        sig_verb_prob_prod = self.signatureGivenVerbProbability(global_verb_sig_count)
+        #print sig_verb_prob_prod
+    
+    def signatureGivenVerbProbability(self,global_verb_sig_count):
+        graph = self.graph
+        probabilities_list = []
+        for i in range(len(graph)):
+            action = graph[i]
+            arguments = self.getArgumentsFromAction(action)
+            verb = self.getVerbFromAction(action)
+            key_value_list_dict = self.calculateVerbSignatureProbabilitiesPerVerb(global_verb_sig_count, verb)
+            for arg in arguments:
+                sig_verb_prob_one = 1
+                origin = self.getOriginFromArgument(arg)
+                if origin:
+                    
+                    verb_sig = self.getVerbSignature(action)
+                    print action
+                    sig_verb_str =  self.verbSignatureToString(verb_sig)
+                    sig_verb_prob_one = key_value_list_dict[verb + "-" + sig_verb_str]
+         #           if not sig_verb_prob_one:
+         #               print verb + "-" + sig_verb_str
+            probabilities_list.append(sig_verb_prob_one)
+        sig_verb_prob_prod = np.prod(probabilities_list)
+        print probabilities_list
+        return sig_verb_prob_prod
+            
+        
+    def calculateVerbSignatureProbabilitiesPerVerb(self, global_verb_sig_count, verb):
+        key_value_list_dict = {}
+        key_value_list = [[key,value] for key, value in global_verb_sig_count.items() if verb in key.lower()]
+        total = sum([key_value[1] for key_value in key_value_list])
+        for key_value in key_value_list:
+            key_value[1] = (key_value[1]/float(total))
+            key = key_value[0]
+            value = key_value[1]
+            key_value_list_dict[key] = value
+            
+        #print key_value_list_dict
+        return key_value_list_dict
+                            
+                
+        
+        
+    
     def argumentTypes(self, action):
         food = 0
         location = 0
@@ -432,9 +479,11 @@ global_verb_count = pickle.load(pkl_file)
 global_verb_type = pickle.load(pkl_file)
 
 global_verb_sig_count = pickle.load(pkl_file)
-#amishMeatloaf.makeConnections(global_verb_count,global_verb_type)
+amishMeatloaf.makeConnections(global_verb_count,global_verb_type)
+(_,global_verb_sig_count) = amishMeatloaf.getCountVerbSignature()
 #pprint(amishMeatloaf.graph)
 #amishMeatloaf.getCountVerbSignature()
+amishMeatloaf.evaluateGraph(global_verb_count,global_verb_type, global_verb_sig_count)
 
 
 
