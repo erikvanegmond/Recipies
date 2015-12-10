@@ -74,7 +74,7 @@ class Recipe(object):
         return graphObject
 
     def determineActionResult(self, arguments):
-        (foodCount, locationCount) =  self.argumentTypes(arguments)
+        (foodCount, locationCount, _) =  self.argumentTypes(arguments)
         if foodCount:
             actionResult = "food"
         elif locationCount:
@@ -104,7 +104,7 @@ class Recipe(object):
         chosenConnections = set()
         for i, action in enumerate(self.graph):
             if i:
-                (foodCount, locationCount) = self.argumentTypes(self.getArgumentsFromAction(action))
+                (foodCount, locationCount, _) = self.argumentTypes(self.getArgumentsFromAction(action))
                 if locationCount:
                     for arg in self.getArgumentsFromAction(action):
                         if self.getSemanticTypeFromArgument(arg) == "location":
@@ -167,7 +167,84 @@ class Recipe(object):
                                 self.addArgumentToAction(action, ["?", "location", "?", "implicit", actionID])
                 else:
                     "I don't recognize this argument!"
+
                 self.setActionResultFromAction(action, self.determineActionResult(self.getArgumentsFromAction(action)))
+
+        (actionList, connectedActionsList) = self.checkFullGraph()
+        print self.getIngredients()
+        for actionID in actionList[0:-1]:
+            if not actionID in connectedActionsList:
+                need = self.getActionResultFromAction( self.getActionFromID(actionID) )
+                actionProbs = []
+                for index in range(actionList.index(actionID)+1, len(actionList)):
+                    goalID = actionList[index]
+                    checkAction = self.getActionFromID(goalID)
+                    arguments = self.getArgumentsFromAction(checkAction)
+                    (food, location, _) = self.argumentTypes(arguments)
+                    verb = self.getVerbFromAction(checkAction)
+                    countList = self.getArgumentsCountList(verb, global_verb_type)
+                    prob = self.getProbabilitiesForPossibleActions(need, food, location, countList)
+                    actionProbs.append( (goalID, prob) )
+                actionProbs.sort(key=lambda x: x[1], reverse=True)
+                if actionProbs:
+                    goalID = actionProbs[0][0]
+                    self.makeLinkBetween(actionID, goalID)
+
+        print self.isFullGraph()
+
+    def isFullGraph(self):
+        (actionList, connectedActionsList) = self.checkFullGraph()
+        for action in actionList[0:-1]:
+            if not action in connectedActionsList:
+                return False
+        return True
+
+    def checkFullGraph(self):
+        actionList = []
+        connectedActionsList = []
+        for i, action in enumerate(self.graph):
+            id = self.getIDfromAction(action)
+            actionList.append(id)
+            arguments = self.getArgumentsFromAction(action)
+            for arg in arguments:
+                originID = self.getOriginFromArgument(arg)
+                if originID:
+                    connectedActionsList.append(originID)
+        return(actionList, connectedActionsList)
+
+    def makeLinkBetween(self, origin, destination):
+        originAction = self.getActionFromID(origin)
+        need = self.getActionResultFromAction( originAction )
+
+        destinationAction = self.getActionFromID(destination)
+        destArgs = self.getArgumentsFromAction(destinationAction)
+        (food, location, unkown) = self.argumentTypes(destArgs)
+        if unkown == 0:
+            #add what we need
+            self.addArgumentToAction(destinationAction, ["?", need, "?", "implicit", origin])
+
+        else:
+           #no fancy stuff, just add
+           #TODO fancy stuff
+           self.addArgumentToAction(destinationAction, ["?", need, "?", "implicit", origin])
+
+
+
+
+    def getProbabilitiesForPossibleActions(self, need, haveFood, haveLocation, argumentTypeCount):
+        argumentsTypesList = ["-1-location", "-1-food", "-2-food", "-2-location", "-2-food-location"]
+
+        needTotal = 0
+        if need == "food" and not haveFood:
+            needTotal = argumentTypeCount[1] + argumentTypeCount[2] + argumentTypeCount[4]
+        elif need == "location" and not haveLocation:
+            needTotal = argumentTypeCount[0] + argumentTypeCount[3] + argumentTypeCount[4]
+
+        countSum = sum(argumentTypeCount)
+        if countSum:
+            return needTotal/float(sum(argumentTypeCount))
+        else:
+            return 0
 
 
     def isFood(self, string):
@@ -303,7 +380,6 @@ class Recipe(object):
                     continue
         return (verb_count, verb_type)
 
-
     def connectionCounter(self):
         connection_count = {}
         connec_verb_sig_count = {}
@@ -346,6 +422,9 @@ class Recipe(object):
         self.calculatePriorProbability(global_verb_sig_count)        
 
 
+    def getProbabilitiesForArguments(self, verb, global_verb_count, global_verb_type):
+        count_list = self.getArgumentsCountList(verb, global_verb_type)
+        countSum = float(sum(count_list))
     
     def calculatePriorProbability(self, global_verb_sig_count):
         sig_verb_prob_prod = self.signatureGivenVerbProbability(global_verb_sig_count)
@@ -393,15 +472,36 @@ class Recipe(object):
         
         
     
-    def argumentTypes(self, action):
+        for i, count in enumerate(count_list):
+            count_list[i] = count/countSum
+        print verb, count_list
+
+    def getArgumentsCountList(self, verb, global_verb_type):
+        count_list = []
+        argumentsTypesList = ["-1-location", "-1-food", "-2-food", "-2-location", "-2-food-location"]
+        # print global_verb_type
+        # print verb
+        count_list.append( global_verb_type[verb + "-1-location"] )
+        count_list.append( global_verb_type[verb + "-1-food"])
+        count_list.append( global_verb_type[verb + "-2-food"])
+        count_list.append( global_verb_type[verb + "-2-location"])
+        count_list.append( global_verb_type[verb + "-2-food-location"])
+
+        return count_list
+
+    def argumentTypes(self, arguments, log=0):
         food = 0
         location = 0
-        for arg in action:
-            if self.getSemanticTypeFromArgument(arg) == "food":
+        unkown = 0
+        for arg in arguments:
+            semanticType = self.getSemanticTypeFromArgument(arg)
+            if semanticType == "food":
                 food +=1
-            elif self.getSemanticTypeFromArgument(arg) == "location":
+            elif semanticType == "location":
                 location +=1
-        return (food, location)
+            elif semanticType == "?":
+                unkown += 1
+        return (food, location, unkown)
 
     def findPossibleConnection(self, actionIndex, type, disallowedConnections):
         for i in reversed(range(actionIndex)):
@@ -481,7 +581,7 @@ global_verb_type = pickle.load(pkl_file)
 global_verb_sig_count = pickle.load(pkl_file)
 amishMeatloaf.makeConnections(global_verb_count,global_verb_type)
 (_,global_verb_sig_count) = amishMeatloaf.getCountVerbSignature()
-#pprint(amishMeatloaf.graph)
+# pprint(amishMeatloaf.graph)
 #amishMeatloaf.getCountVerbSignature()
 amishMeatloaf.evaluateGraph(global_verb_count,global_verb_type, global_verb_sig_count)
 
