@@ -418,7 +418,7 @@ class Recipe(object):
         return argumentsTypesList[count_list.index(max(count_list))]
         
     def evaluateGraph(self, global_verb_sig_count, global_connection_verb_sig_count):
-        self.calculatePriorProbability(global_verb_sig_count)        
+        self.calculatePriorProbability(global_verb_sig_count, global_connection_verb_sig_count)        
 
 
     def getProbabilitiesForArguments(self, verb, global_verb_count, global_verb_type):
@@ -430,7 +430,7 @@ class Recipe(object):
     def calculatePriorProbability(self, global_verb_sig_count, global_connection_verb_sig_count):
         sig_verb_prob_prod = self.signatureGivenVerbProbability(global_verb_sig_count)
         #print sig_verb_prob_prod
-        self.sigConnectionProbability(global_connection_verb_sig_count)
+        connection_prob_prod = self.sigConnectionProbability(global_connection_verb_sig_count)
 
     
     def signatureGivenVerbProbability(self,global_verb_sig_count):
@@ -445,14 +445,12 @@ class Recipe(object):
                 sig_verb_prob_one = 1
                 origin = self.getOriginFromArgument(arg)
                 if origin:
-                    
                     verb_sig = self.getVerbSignature(action)
                     sig_verb_str =  self.verbSignatureToString(verb_sig)
                     sig_verb_prob_one = key_value_list_dict[verb + "-" + sig_verb_str]
          #           if not sig_verb_prob_one:
          #               print verb + "-" + sig_verb_str
             probabilities_list.append(sig_verb_prob_one)
-        print probabilities_list
         sig_verb_prob_prod = np.prod(probabilities_list)
         return sig_verb_prob_prod
             
@@ -466,14 +464,54 @@ class Recipe(object):
             key = key_value[0]
             value = key_value[1]
             key_value_list_dict[key] = value
-            
-        print key_value_list_dict
         return key_value_list_dict
         
-    def sigConnectionProbability(global_connection_verb_sig_count):
+    def sigConnectionProbability(self, global_connection_verb_sig_count):
+        graph = self.graph
+        probabilities_list = []
+        for action in graph:
+            arguments = self.getArgumentsFromAction(action)
+            for arg in arguments:
+                connection_prob_one = 1
+                origin = self.getOriginFromArgument(arg)
+                if origin:
+                    signature_incoming = self.getVerbSignature(action)
+                    id1 = self.getIDfromAction(action)
+                    # Why does this only give me the actions after action? I print it so you'll see it yourself
+                    for action2 in graph:
+                        print "origin: " + origin
+                        id2 = self.getIDfromAction(action)
+                        print "id2: " + id2
+                        if id2 == origin:
+                            signature_outgoing = self.getVerbSignature(action2)
+                            probabilities_dict = self.calculateConnectionProbabilities(global_connection_verb_sig_count)
+                            connection_prob_one = self.caculateThisConnectionProb(probabilities_dict, id1, id2, signature_incoming, signature_outgoing)
+                    #if not connection_prob_one:
+                    #    print verb + "-" + sig_verb_str
+            probabilities_list.append(connection_prob_one)
+        print probabilities_list
+        connection_prob_prod = np.prod(probabilities_list)
+        return connection_prob_prod
         
-        
+    def calculateConnectionProbabilities(self, global_connection_verb_sig_count):
+        probabilities_dict = {}
+        total = sum([counts[1] for counts in global_connection_verb_sig_count])
+        for key_value in global_connection_verb_sig_count:
+            print key_value
+            key_value[1] = (key_value[1]/float(total))
+            key = key_value[0]
+            value = key_value[1]
+            probabilities_dict[key] = value
+            print "prob dict: "
+            print probabilities_dict
+        return probabilities_dict
+    
                             
+    def caculateThisConnectionProb(self, probabilities_dict, id1, id2, signature_incoming, signature_outgoing):
+        connection_prob_one = probabilities_dict[signature_incoming + id1 + "-" + signature_outgoing + id2]
+        return connection_prob_one
+        
+
                 
     def getArgumentsCountList(self, verb, global_verb_type):
         count_list = []
