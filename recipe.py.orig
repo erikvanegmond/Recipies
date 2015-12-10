@@ -414,10 +414,15 @@ class Recipe(object):
         count_list.append( global_verb_type[verb + "-2-food-location"])
         # print count_list.index(max(count_list))
         return argumentsTypesList[count_list.index(max(count_list))]
+<<<<<<< HEAD
         
+    def evaluateGraph(self, global_verb_sig_count, global_connection_verb_sig_count):
+        self.calculatePriorProbability(global_verb_sig_count, global_connection_verb_sig_count)        
+=======
+>>>>>>> 9b8cb110ae27f42a62d242a4105e6eee07954846
 
     def evaluateGraph(self, global_verb_sig_count, global_connection_verb_sig_count):
-        self.calculatePriorProbability(global_verb_sig_count, global_connection_verb_sig_count)
+        self.calculatePriorProbability(global_verb_sig_count)
 
     def getProbabilitiesForArguments(self, verb, global_verb_count, global_verb_type):
         count_list = self.getArgumentsCountList(verb, global_verb_type)
@@ -442,6 +447,10 @@ class Recipe(object):
                 sig_verb_prob_one = 1
                 origin = self.getOriginFromArgument(arg)
                 if origin:
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9b8cb110ae27f42a62d242a4105e6eee07954846
                     verb_sig = self.getVerbSignature(action)
                     sig_verb_str =  self.verbSignatureToString(verb_sig)
                     sig_verb_prob_one = key_value_list_dict[verb + "-" + sig_verb_str]
@@ -460,6 +469,7 @@ class Recipe(object):
             key = key_value[0]
             value = key_value[1]
             key_value_list_dict[key] = value
+<<<<<<< HEAD
         return key_value_list_dict
         
     def sigConnectionProbability(self, global_connection_verb_sig_count):
@@ -489,6 +499,14 @@ class Recipe(object):
         print probabilities_list
         connection_prob_prod = np.prod(probabilities_list)
         return connection_prob_prod
+=======
+
+        print key_value_list_dict
+        return key_value_list_dict
+
+    def sigConnectionProbability(global_connection_verb_sig_count):
+        
+>>>>>>> 9b8cb110ae27f42a62d242a4105e6eee07954846
         
     def calculateConnectionProbabilities(self, global_connection_verb_sig_count):
         probabilities_dict = {}
@@ -504,11 +522,15 @@ class Recipe(object):
         return probabilities_dict
     
                             
+<<<<<<< HEAD
     def caculateThisConnectionProb(self, probabilities_dict, id1, id2, signature_incoming, signature_outgoing):
         connection_prob_one = probabilities_dict[signature_incoming + id1 + "-" + signature_outgoing + id2]
         return connection_prob_one
         
 
+                
+=======
+>>>>>>> 9b8cb110ae27f42a62d242a4105e6eee07954846
     def getArgumentsCountList(self, verb, global_verb_type):
         count_list = []
         argumentsTypesList = ["-1-location", "-1-food", "-2-food", "-2-location", "-2-food-location"]
