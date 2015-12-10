@@ -36,6 +36,8 @@ for s in food.closure(lambda s:s.hyponyms()):
 
 foods += ['sesame oil', 'poppy seeds', 'canola oil', 'baking powder', 'cornstarch', 'pecans']
 foods.remove('cup')
+foods.remove('mash')
+foods.remove('chop')
 print foods
 
 pickle.dump(foods, output)
