@@ -16,7 +16,7 @@ recipeList =[]
 fixedPath = "..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt"
 recipeList.append(Recipe(fixedPath))
 c = 0
-cmax = 20
+cmax = 2000
 for subdir, dirs, files in os.walk(rootdir):
     for file in files:
         if file == ".DS_Store":
