@@ -34,7 +34,7 @@ for subdir, dirs, files in os.walk(rootdir):
     if c > cmax:
         break
 
-
+'''
 output = open('globals.pkl', 'wb')
 
 global_verb_count = {}
@@ -81,7 +81,7 @@ pickle.dump(global_verb_sig_count, output)
 pickle.dump(global_connection_count, output)
 pickle.dump(global_connection_verb_sig_count, output)
 output.close()
-
+'''
 
 pkl_file = open('globals.pkl', 'r')
 global_verb_count = pickle.load(pkl_file)
@@ -90,12 +90,16 @@ global_verb_signature = pickle.load(pkl_file)
 global_connection_count = pickle.load(pkl_file)
 global_connection_verb_sig_count = pickle.load(pkl_file)
 
+for key in global_verb_signature:
+    global_verb_signature[key] += 0.1
+    print global_verb_signature[key]
+
 # recipeList[0].makeConnections(global_verb_count,global_verb_type)
 # pprint(recipeList[0].graph)
-for item in recipeList:
-    print item
-    item.makeConnections(global_verb_count,global_verb_type)
-    pprint( item.graph )
-    print
+#for item in recipeList:
+#    print item
+#    item.makeConnections(global_verb_count,global_verb_type)
+#    pprint( item.graph )
+#    print
 
 
