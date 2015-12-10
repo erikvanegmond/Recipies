@@ -425,10 +425,14 @@ class Recipe(object):
     def getProbabilitiesForArguments(self, verb, global_verb_count, global_verb_type):
         count_list = self.getArgumentsCountList(verb, global_verb_type)
         countSum = float(sum(count_list))
+        for i, count in enumerate(count_list):
+            count_list[i] = count/countSum
+        print verb, count_list
     
     def calculatePriorProbability(self, global_verb_sig_count):
         sig_verb_prob_prod = self.signatureGivenVerbProbability(global_verb_sig_count)
         #print sig_verb_prob_prod
+
     
     def signatureGivenVerbProbability(self,global_verb_sig_count):
         graph = self.graph
@@ -469,13 +473,6 @@ class Recipe(object):
         return key_value_list_dict
                             
                 
-        
-        
-    
-        for i, count in enumerate(count_list):
-            count_list[i] = count/countSum
-        print verb, count_list
-
     def getArgumentsCountList(self, verb, global_verb_type):
         count_list = []
         argumentsTypesList = ["-1-location", "-1-food", "-2-food", "-2-location", "-2-food-location"]
