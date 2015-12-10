@@ -122,7 +122,7 @@ class Recipe(object):
                         actionID = self.findPossibleConnection(i, "location", chosenConnections)
                         if actionID:
                             chosenConnections.add(actionID)
-                            self.addArgumentToAction(action, ["?", "location", "impicit", actionID])
+                            self.addArgumentToAction(action, ["?", "location", "?", "implicit", actionID])
 
                 elif argument == "-1-food":
                     if foodCount == 1 and locationCount == 0:
@@ -131,7 +131,7 @@ class Recipe(object):
                         actionID = self.findPossibleConnection(i, "food", chosenConnections)
                         if actionID:
                             chosenConnections.add(actionID)
-                            self.addArgumentToAction(action, ["?", "food", "impicit", actionID])
+                            self.addArgumentToAction(action, ["?", "food", "?", "implicit", actionID])
                 elif argument == "-2-food":
                     if foodCount >= 2 and locationCount == 0:
                         pass
@@ -140,7 +140,7 @@ class Recipe(object):
                             actionID = self.findPossibleConnection(i, "food", chosenConnections)
                             if actionID:
                                 chosenConnections.add(actionID)
-                                self.addArgumentToAction(action, ["?", "food", "impicit", actionID])
+                                self.addArgumentToAction(action, ["?", "food", "?", "implicit", actionID])
                 elif argument == "-2-location":
                     if foodCount == 0 and locationCount >= 2:
                         pass
@@ -149,7 +149,7 @@ class Recipe(object):
                             actionID = self.findPossibleConnection(i, "location", chosenConnections)
                             if actionID:
                                 chosenConnections.add(actionID)
-                                self.addArgumentToAction(action, ["?", "location", "impicit", actionID])
+                                self.addArgumentToAction(action, ["?", "location", "?", "implicit", actionID])
                 elif argument == "-2-food-location":
                     if (foodCount >=2 and locationCount == 0) or (foodCount == 0 and locationCount >= 2) or (foodCount == 1 and locationCount == 1):
                         pass
@@ -158,12 +158,12 @@ class Recipe(object):
                             actionID = self.findPossibleConnection(i, "food", chosenConnections)
                             if actionID:
                                 chosenConnections.add(actionID)
-                                self.addArgumentToAction(action, ["?", "food", "impicit", actionID])
+                                self.addArgumentToAction(action, ["?", "food", "?", "implicit", actionID])
                         if locationCount == 0:
                             actionID = self.findPossibleConnection(i, "location", chosenConnections)
                             if actionID:
                                 chosenConnections.add(actionID)
-                                self.addArgumentToAction(action, ["?", "location", "impicit", actionID])
+                                self.addArgumentToAction(action, ["?", "location", "?", "implicit", actionID])
                 else:
                     "I don't recognize this argument!"
                 self.setActionResultFromAction(action, self.determineActionResult(self.getArgumentsFromAction(action)))
@@ -200,7 +200,7 @@ class Recipe(object):
             if found:
                 return potentialFood
         return False
-        
+
     def getCountVerbSignature(self):
         verb_sig_count = {}
         verb_sig_list = []
@@ -217,7 +217,7 @@ class Recipe(object):
             verb_sig_list.append(verb_sig)
             self.countVerbSignature(self.getVerbFromAction(action), verb_sig, verb_sig_count)
         return (verb_sig_list, verb_sig_count)
-            
+
     def getVerbSignature(self, action):
         dobj = 0
         parg = 0
@@ -247,12 +247,14 @@ class Recipe(object):
             print 'no verb signature made'
             verb_sig = ([],0)
         return verb_sig
-        
+
     def countVerbSignature(self, verb, verb_sig, verb_sig_count):
-        flag = "true" if verb_sig[1] else "false" 
-        verb_sig_count[verb + "-"  + "".join(verb_sig[0]) + "-" + flag] += 1 
-            
-            
+        verb_sig_str = self.verbSignatureToString(verb_sig)
+        verb_sig_count[verb + "-" + verb_sig_str] += 1
+
+    def verbSignatureToString(self, verb_sig):
+        flag = "true" if verb_sig[1] else "false"
+        return "".join(verb_sig[0]) + "-" + flag
 
     def verbCounter(self):
         verb_count = {}
@@ -300,7 +302,34 @@ class Recipe(object):
                 else:
                     continue
         return (verb_count, verb_type)
-            
+
+
+    def connectionCounter(self):
+        connection_count = {}
+        connec_verb_sig_count = {}
+
+        for action in self.graph:
+            arguments = self.getArgumentsFromAction(action)
+            for argnum, argument in enumerate(arguments):
+                origin = self.getOriginFromArgument(argument)
+                if origin:
+                    key = str(self.getOriginFromArgument(argument)) + "-" + str(self.getIDfromAction(action))
+
+                    if key in connection_count:
+                        connection_count[key] += 1
+                    else:
+                        connection_count[key] = 1
+
+                    originAction_verb_sig_str = self.verbSignatureToString(self.getVerbSignature(self.getActionFromID(self.getOriginFromArgument(argument))))
+                    destinationAction_verb_sig_str = self.verbSignatureToString(self.getVerbSignature(self.getActionFromID(self.getIDfromAction(action))))
+                    key = originAction_verb_sig_str + "_" + destinationAction_verb_sig_str
+
+                    if key in connec_verb_sig_count:
+                        connec_verb_sig_count[key] += 1
+                    else:
+                        connec_verb_sig_count[key] = 1
+
+        return (connection_count, connec_verb_sig_count)
 
     def mostPobableArguments(self, verb, global_verb_count, global_verb_type):
         count_list = []
@@ -380,6 +409,11 @@ class Recipe(object):
         if len(argument) >= 5:
             return argument[4]
 
+    def getActionFromID(self, ID):
+        for action in self.graph:
+            if self.getIDfromAction(action) == ID:
+                return action
+
     def __str__(self):
         return "a recipe based on "+self.filepath
 
@@ -396,10 +430,12 @@ amishMeatloaf = Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish
 pkl_file = open('globals.pkl', 'r')
 global_verb_count = pickle.load(pkl_file)
 global_verb_type = pickle.load(pkl_file)
+
 global_verb_sig_count = pickle.load(pkl_file)
 #amishMeatloaf.makeConnections(global_verb_count,global_verb_type)
 #pprint(amishMeatloaf.graph)
 #amishMeatloaf.getCountVerbSignature()
+
 
 
 # print amishMeatloaf.verbCounter()
