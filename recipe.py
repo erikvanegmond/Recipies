@@ -8,7 +8,6 @@ from nltk.util import ngrams
 from pprint import *
 
 
-
 class Recipe(object):
     """docstring for Recipe"""
 
@@ -16,7 +15,7 @@ class Recipe(object):
     cookware = None
     stemmer = None
 
-    def __init__(self, filepath):
+    def __init__(self, filepath, make_graph=True):
         self.filepath = filepath
         if not Recipe.foods:
             pkl_file = open('foods.pkl', 'r')
@@ -31,9 +30,8 @@ class Recipe(object):
             print "loaded stemmer"
         self.maxNgrams = 5
 
-        self.graph = self.makeGraph()
-        # print pprint(self.graph)
-
+        if make_graph:
+            self.graph = self.makeGraph()
 
     def probability(self):
         return 1
@@ -224,12 +222,13 @@ class Recipe(object):
             self.addArgumentToAction(destinationAction, ["?", need, "?", "implicit", origin])
 
         else:
-           #no fancy stuff, just add
-           #TODO fancy stuff
-           self.addArgumentToAction(destinationAction, ["?", need, "?", "implicit", origin])
+            #no fancy stuff, just add
+            #TODO fancy stuff
+            self.addArgumentToAction(destinationAction, ["?", need, "?", "implicit", origin])
 
+    def change_connection(self):
 
-
+        pass
 
     def getProbabilitiesForPossibleActions(self, need, haveFood, haveLocation, argumentTypeCount):
         argumentsTypesList = ["-1-location", "-1-food", "-2-food", "-2-location", "-2-food-location"]
@@ -245,7 +244,6 @@ class Recipe(object):
             return needTotal/float(sum(argumentTypeCount))
         else:
             return 0
-
 
     def isFood(self, string):
         return self.isType(string, "food")
@@ -322,7 +320,6 @@ class Recipe(object):
         elif dobj == 0 and parg > 0 and origin != 0:
             verb_sig = (['PARG'], False)
         else:
-            print 'no verb signature made'
             verb_sig = ([],0)
         return verb_sig
 
@@ -417,10 +414,9 @@ class Recipe(object):
         count_list.append( global_verb_type[verb + "-2-food-location"])
         # print count_list.index(max(count_list))
         return argumentsTypesList[count_list.index(max(count_list))]
-        
-    def evaluateGraph(self, global_verb_count, global_verb_type, global_verb_sig_count):
-        self.calculatePriorProbability(global_verb_sig_count)        
 
+    def evaluateGraph(self, global_verb_count, global_verb_type, global_verb_sig_count):
+        self.calculatePriorProbability(global_verb_sig_count)
 
     def getProbabilitiesForArguments(self, verb, global_verb_count, global_verb_type):
         count_list = self.getArgumentsCountList(verb, global_verb_type)
@@ -428,12 +424,11 @@ class Recipe(object):
         for i, count in enumerate(count_list):
             count_list[i] = count/countSum
         print verb, count_list
-    
+
     def calculatePriorProbability(self, global_verb_sig_count):
         sig_verb_prob_prod = self.signatureGivenVerbProbability(global_verb_sig_count)
         #print sig_verb_prob_prod
 
-    
     def signatureGivenVerbProbability(self,global_verb_sig_count):
         graph = self.graph
         probabilities_list = []
@@ -446,7 +441,7 @@ class Recipe(object):
                 sig_verb_prob_one = 1
                 origin = self.getOriginFromArgument(arg)
                 if origin:
-                    
+
                     verb_sig = self.getVerbSignature(action)
                     print action
                     sig_verb_str =  self.verbSignatureToString(verb_sig)
@@ -457,8 +452,7 @@ class Recipe(object):
         sig_verb_prob_prod = np.prod(probabilities_list)
         print probabilities_list
         return sig_verb_prob_prod
-            
-        
+
     def calculateVerbSignatureProbabilitiesPerVerb(self, global_verb_sig_count, verb):
         key_value_list_dict = {}
         key_value_list = [[key,value] for key, value in global_verb_sig_count.items() if verb in key.lower()]
@@ -468,11 +462,10 @@ class Recipe(object):
             key = key_value[0]
             value = key_value[1]
             key_value_list_dict[key] = value
-            
+
         #print key_value_list_dict
         return key_value_list_dict
-                            
-                
+
     def getArgumentsCountList(self, verb, global_verb_type):
         count_list = []
         argumentsTypesList = ["-1-location", "-1-food", "-2-food", "-2-location", "-2-food-location"]
@@ -558,16 +551,12 @@ class Recipe(object):
             if self.getIDfromAction(action) == ID:
                 return action
 
+
+    def copy_graph(self):
+        new_graph = self.graph.copy()
+
     def __str__(self):
         return "a recipe based on "+self.filepath
-
-    def static_vars(**kwargs):
-        def decorate(func):
-            for k in kwargs:
-                setattr(func, k, kwargs[k])
-            return func
-        return decorate
-
 
 amishMeatloaf = Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt")
 # pprint(amishMeatloaf.graph)
@@ -578,7 +567,7 @@ global_verb_type = pickle.load(pkl_file)
 global_verb_sig_count = pickle.load(pkl_file)
 amishMeatloaf.makeConnections(global_verb_count,global_verb_type)
 (_,global_verb_sig_count) = amishMeatloaf.getCountVerbSignature()
-# pprint(amishMeatloaf.graph)
+pprint(amishMeatloaf.graph)
 #amishMeatloaf.getCountVerbSignature()
 amishMeatloaf.evaluateGraph(global_verb_count,global_verb_type, global_verb_sig_count)
 
