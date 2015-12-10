@@ -478,6 +478,7 @@ class Recipe(object):
                     signature_incoming = self.getVerbSignature(action)
                     id1 = self.getIDfromAction(action)
                     # Why does this only give me the actions after action? I print it so you'll see it yourself
+                    #small change for git                    
                     for action2 in graph:
                         print "origin: " + origin
                         id2 = self.getIDfromAction(action)
