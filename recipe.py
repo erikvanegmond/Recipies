@@ -517,7 +517,6 @@ class Recipe(object):
                     signature_incoming = self.getVerbSignature(action)
                     id1 = self.getIDfromAction(action)
                     # Why does this only give me the actions after action? I print it so you'll see it yourself
-<<<<<<< HEAD
                     #small change for git
                     action2 = self.getActionFromID(origin)
                     print "action2: "
@@ -527,8 +526,7 @@ class Recipe(object):
                     connection_prob_one = self.caculateThisConnectionProb(probabilities_dict, id1, origin, signature_incoming, signature_outgoing)
                 #if not connection_prob_one:
                 #    print verb + "-" + sig_verb_str
-=======
-                    #small change for git                    
+                    #small change for git
                     for action2 in graph:
                         print "origin: " + origin
                         id2 = self.getIDfromAction(action2)
@@ -539,7 +537,6 @@ class Recipe(object):
                             connection_prob_one = self.caculateThisConnectionProb(probabilities_dict, id1, id2, signature_incoming, signature_outgoing)
                     #if not connection_prob_one:
                     #    print verb + "-" + sig_verb_str
->>>>>>> 9846bc70449c9d286ab8e55b690260d0321b858d
             probabilities_list.append(connection_prob_one)
         print probabilities_list
         connection_prob_prod = np.prod(probabilities_list)
@@ -678,20 +675,17 @@ for key in global_verb_sig_count:
     global_verb_sig_count[key] += 0.1
 amishMeatloaf.makeConnections(global_verb_count,global_verb_type)
 #(_,global_verb_sig_count) = amishMeatloaf.getCountVerbSignature()
-<<<<<<< HEAD
 #pprint(amishMeatloaf.graph)
 #amishMeatloaf.getCountVerbSignature()
 amishMeatloaf.evaluateGraph(global_verb_sig_count, global_connection_verb_sig_count)
 #(connection_count, connec_verb_sig_count) = amishMeatloaf.connectionCounter()
 
 
-=======
 # pprint(amishMeatloaf.graph)
 #amishMeatloaf.getCountVerbSignature()
 # amishMeatloaf.evaluateGraph(global_verb_sig_count, global_connection_verb_sig_count)
 # (connection_count, connec_verb_sig_count) = amishMeatloaf.connectionCounter()
 amishMeatloaf.change_connection(global_verb_sig_count, global_connection_verb_sig_count)
->>>>>>> 9846bc70449c9d286ab8e55b690260d0321b858d
 
 # print amishMeatloaf.verbCounter()
 # amishMeatloaf.getIngredients()
