@@ -474,17 +474,15 @@ class Recipe(object):
                     signature_incoming = self.getVerbSignature(action)
                     id1 = self.getIDfromAction(action)
                     # Why does this only give me the actions after action? I print it so you'll see it yourself
-                    #small change for git                    
-                    for action2 in graph:
-                        print "origin: " + origin
-                        id2 = self.getIDfromAction(action)
-                        print "id2: " + id2
-                        if id2 == origin:
-                            signature_outgoing = self.getVerbSignature(action2)
-                            probabilities_dict = self.calculateConnectionProbabilities(global_connection_verb_sig_count)
-                            connection_prob_one = self.caculateThisConnectionProb(probabilities_dict, id1, id2, signature_incoming, signature_outgoing)
-                    #if not connection_prob_one:
-                    #    print verb + "-" + sig_verb_str
+                    #small change for git
+                    action2 = self.getActionFromID(origin)
+                    print "action2: "
+                    print action2
+                    signature_outgoing = self.getVerbSignature(action2)
+                    probabilities_dict = self.calculateConnectionProbabilities(global_connection_verb_sig_count)
+                    connection_prob_one = self.caculateThisConnectionProb(probabilities_dict, id1, origin, signature_incoming, signature_outgoing)
+                #if not connection_prob_one:
+                #    print verb + "-" + sig_verb_str
             probabilities_list.append(connection_prob_one)
         print probabilities_list
         connection_prob_prod = np.prod(probabilities_list)
@@ -492,7 +490,9 @@ class Recipe(object):
         
     def calculateConnectionProbabilities(self, global_connection_verb_sig_count):
         probabilities_dict = {}
+        print global_connection_verb_sig_count
         total = sum([counts[1] for counts in global_connection_verb_sig_count])
+        print total
         for key_value in global_connection_verb_sig_count:
             print key_value
             key_value[1] = (key_value[1]/float(total))
@@ -606,17 +606,18 @@ amishMeatloaf = Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish
 pkl_file = open('globals.pkl', 'r')
 global_verb_count = pickle.load(pkl_file)
 global_verb_type = pickle.load(pkl_file)
-
 global_verb_sig_count = pickle.load(pkl_file)
+global_connection_count = pickle.load(pkl_file)
+global_connection_verb_sig_count = pickle.load(pkl_file)
 
 for key in global_verb_sig_count:
     global_verb_sig_count[key] += 0.1
 amishMeatloaf.makeConnections(global_verb_count,global_verb_type)
 #(_,global_verb_sig_count) = amishMeatloaf.getCountVerbSignature()
-pprint(amishMeatloaf.graph)
+#pprint(amishMeatloaf.graph)
 #amishMeatloaf.getCountVerbSignature()
 amishMeatloaf.evaluateGraph(global_verb_sig_count, global_connection_verb_sig_count)
-(connection_count, connec_verb_sig_count) = amishMeatloaf.connectionCounter()
+#(connection_count, connec_verb_sig_count) = amishMeatloaf.connectionCounter()
 
 
 
