@@ -226,7 +226,7 @@ class Recipe(object):
             #TODO fancy stuff
             self.addArgumentToAction(destinationAction, ["?", need, "?", "implicit", origin])
 
-    def change_connection(self, global_verb_sig_count, global_connection_verb_sig_count):
+    def change_connection(self, global_verb_sig_count, global_origin_connection_count):
         possible_swaps = self.find_possible_swaps(self.graph)
 
         for swap in possible_swaps:
@@ -234,7 +234,7 @@ class Recipe(object):
             swapped_graph = self.swap_connection(self.graph, swap)
             swapped_recipy = Recipe(self.filepath, make_graph=False)
             swapped_recipy.graph = swapped_graph
-            print swapped_recipy.evaluateGraph(global_verb_sig_count, global_connection_verb_sig_count)
+            print swapped_recipy.evaluateGraph(global_verb_sig_count, global_origin_connection_count)
         # self.swap_connection(new_graph)
         pass
 
@@ -459,8 +459,8 @@ class Recipe(object):
         # print count_list.index(max(count_list))
         return argumentsTypesList[count_list.index(max(count_list))]
 
-    def evaluateGraph(self, global_verb_sig_count, global_connection_verb_sig_count):
-        self.calculatePriorProbability(global_verb_sig_count, global_connection_verb_sig_count)
+    def evaluateGraph(self, global_verb_sig_count, global_origin_connection_count):
+        self.calculatePriorProbability(global_verb_sig_count, global_origin_connection_count)
 
     def getProbabilitiesForArguments(self, verb, global_verb_count, global_verb_type):
         count_list = self.getArgumentsCountList(verb, global_verb_type)
@@ -468,10 +468,12 @@ class Recipe(object):
         for i, count in enumerate(count_list):
             count_list[i] = count/countSum
 
-    def calculatePriorProbability(self, global_verb_sig_count, global_connection_verb_sig_count):
+    def calculatePriorProbability(self, global_verb_sig_count, global_origin_connection_count):
         sig_verb_prob_prod = self.signatureGivenVerbProbability(global_verb_sig_count)
-        #print sig_verb_prob_prod
-        connection_prob_prod = self.sigConnectionProbability(global_connection_verb_sig_count)
+        #erased this one, because they weren't to enthausiastic about this in the presentation. Instead I used 
+        #the probability of the origin of this connection given all connections (and the verbsig?)
+        #connection_prob_prod = self.sigConnectionProbability(global_connection_verb_sig_count)
+        prob_origin_connection = self.probOriginConnection(global_origin_connection_count)
 
     def signatureGivenVerbProbability(self,global_verb_sig_count):
         graph = self.graph
@@ -505,6 +507,46 @@ class Recipe(object):
             key_value_list_dict[key] = value
         return key_value_list_dict
         
+    def probOriginConnection(self, global_origin_connection_count):
+        graph = self.graph
+        probabilities_list = []
+        for action in graph:
+            arguments = self.getArgumentsFromAction(action)
+            for arg in arguments:
+                # initialize probability of one connection as 1 in case is doesnt have a probability. This way it will not influence the product
+                connection_prob_one = 1
+                origin = self.getOriginFromArgument(arg)
+                if origin:
+                    signature_incoming = self.getVerbSignature(action)
+                    id1 = self.getIDfromAction(action)
+                    action2 = self.getActionFromID(origin)
+                    print "action2: "
+                    print action2
+                    signature_outgoing = self.getVerbSignature(action2)
+                    probabilities_dict = self.calculateConnectionProbabilities(global_connection_verb_sig_count)
+                    connection_prob_one = self.caculateThisConnectionProb(probabilities_dict, id1, origin, signature_incoming, signature_outgoing)
+                #if not connection_prob_one:
+                #    print verb + "-" + sig_verb_str
+                    #small change for git
+                    for action2 in graph:
+                        print "origin: " + origin
+                        id2 = self.getIDfromAction(action2)
+                        print "id2: " + id2
+                        if id2 == origin:
+                            signature_outgoing = self.getVerbSignature(action2)
+                            probabilities_dict = self.calculateConnectionProbabilities(global_connection_verb_sig_count)
+                            connection_prob_one = self.caculateThisConnectionProb(probabilities_dict, id1, id2, signature_incoming, signature_outgoing)
+                    #if not connection_prob_one:
+                    #    print verb + "-" + sig_verb_str
+            probabilities_list.append(connection_prob_one)
+        print probabilities_list
+        connection_prob_prod = np.prod(probabilities_list)
+        return connection_prob_prod
+        
+        
+        
+        
+'''       
     def sigConnectionProbability(self, global_connection_verb_sig_count):
         graph = self.graph
         probabilities_list = []
@@ -541,6 +583,7 @@ class Recipe(object):
         print probabilities_list
         connection_prob_prod = np.prod(probabilities_list)
         return connection_prob_prod
+    
     def calculateConnectionProbabilities(self, global_connection_verb_sig_count):
         probabilities_dict = {}
         print global_connection_verb_sig_count
@@ -559,6 +602,7 @@ class Recipe(object):
     def caculateThisConnectionProb(self, probabilities_dict, id1, id2, signature_incoming, signature_outgoing):
         connection_prob_one = probabilities_dict[signature_incoming + id1 + "-" + signature_outgoing + id2]
         return connection_prob_one
+'''
 
     def getArgumentsCountList(self, verb, global_verb_type):
         count_list = []
@@ -669,7 +713,7 @@ global_verb_count = pickle.load(pkl_file)
 global_verb_type = pickle.load(pkl_file)
 global_verb_sig_count = pickle.load(pkl_file)
 global_connection_count = pickle.load(pkl_file)
-global_connection_verb_sig_count = pickle.load(pkl_file)
+global_origin_connection_count = pickle.load(pkl_file)
 
 for key in global_verb_sig_count:
     global_verb_sig_count[key] += 0.1
@@ -677,7 +721,7 @@ amishMeatloaf.makeConnections(global_verb_count,global_verb_type)
 #(_,global_verb_sig_count) = amishMeatloaf.getCountVerbSignature()
 #pprint(amishMeatloaf.graph)
 #amishMeatloaf.getCountVerbSignature()
-amishMeatloaf.evaluateGraph(global_verb_sig_count, global_connection_verb_sig_count)
+amishMeatloaf.evaluateGraph(global_verb_sig_count, global_origin_connection_count)
 #(connection_count, connec_verb_sig_count) = amishMeatloaf.connectionCounter()
 
 

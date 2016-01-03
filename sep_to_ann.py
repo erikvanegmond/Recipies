@@ -41,7 +41,7 @@ global_verb_count = {}
 global_verb_type = {}
 global_verb_sig_count = {}
 global_connection_count = {}
-global_connection_verb_sig_count = {}
+global_origin_connection_count = {}
 for item in recipeList:
     (verb_count, verb_type) = item.verbCounter()
     (_, verb_sig_count) = item.getCountVerbSignature()
@@ -67,19 +67,19 @@ for item in recipeList:
             global_connection_count[cc] = global_connection_count[cc]
         else:
             global_connection_count[cc] += global_connection_count[cc]
-    for cvsc in connec_verb_sig_count:
-        if not cvsc in global_connection_verb_sig_count:
-            global_connection_verb_sig_count[cvsc] = global_connection_verb_sig_count[cvsc]
+    for cvs in connec_verb_sig_count:
+        if not cvs in global_origin_connection_count:
+            global_origin_connection_count[cvs] = global_origin_connection_count[cvs]
         else:
-            global_connection_verb_sig_count[cvsc] += global_connection_verb_sig_count[cvsc]
-for key in global_connection_verb_sig_count:
-    global_connection_verb_sig_count[key] += 0.1
+            global_origin_connection_count[cvs] += global_origin_connection_count[cvs]
+#for key in global_origin_connection_count:
+#    global_origin_connection_count[key] += 0.1
 
 pickle.dump(global_verb_count, output)
 pickle.dump(global_verb_type, output)
 pickle.dump(global_verb_sig_count, output)
 pickle.dump(global_connection_count, output)
-pickle.dump(global_connection_verb_sig_count, output)
+pickle.dump(global_origin_connection_count, output)
 output.close()
 '''
 
@@ -88,7 +88,7 @@ global_verb_count = pickle.load(pkl_file)
 global_verb_type = pickle.load(pkl_file)
 global_verb_signature = pickle.load(pkl_file)
 global_connection_count = pickle.load(pkl_file)
-global_connection_verb_sig_count = pickle.load(pkl_file)
+global_origin_connection_count = pickle.load(pkl_file)
 pkl_file.close()
 
 for key in global_verb_signature:
