@@ -550,7 +550,6 @@ class Recipe(object):
                 origin = self.getOriginFromArgument(arg)
                 if origin:
                     id1 = self.getIDfromAction(action)
-                                                                          signature_incoming, signature_outgoing)
                     probabilities_dict = self.calculateConnectionProbabilities(global_connection_verb_sig_count)
                     connection_prob_one = self.caculateThisConnectionProb(probabilities_dict, id1, origin)
                                                                                   signature_incoming,
