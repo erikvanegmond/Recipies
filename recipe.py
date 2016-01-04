@@ -168,9 +168,12 @@ class Recipe(object):
                                 self.addArgumentToAction(action, ["?", "location", "?", "implicit", actionID])
                 else:
                     "I don't recognize this argument!"
-
+                
+                
                 self.setActionResultFromAction(action, self.determineActionResult(self.getArgumentsFromAction(action)))
-
+                print chosenConnections 
+                return chosenConnections
+                
         (actionList, connectedActionsList) = self.checkFullGraph()
         print self.getIngredients()
         for actionID in actionList[0:-1]:
@@ -458,6 +461,7 @@ class Recipe(object):
         return argumentsTypesList[count_list.index(max(count_list))]
 
     def evaluateGraph(self, global_verb_sig_count, global_connection_count):
+        
         prior = self.calculatePriorProbability(global_verb_sig_count, global_connection_count)
         prob = self.prob_verb_given_verb_signature(global_verb_sig_count)
 
@@ -469,7 +473,7 @@ class Recipe(object):
         for i, count in enumerate(count_list):
             count_list[i] = count / countSum
 
-    def calculatePriorProbability(self, global_verb_sig_count, global_connection_count):
+    def calculatePriorProbability(self, global_verb_sig_count, global_connection_count, chosen_connections):     
         sig_verb_prob_prod = self.signatureGivenVerbProbability(global_verb_sig_count)
         prob_origin_connection = self.probOriginConnection(global_connection_count)
         prior = sig_verb_prob_prod * prob_origin_connection
@@ -485,11 +489,9 @@ class Recipe(object):
             key_value_list_dict = self.calculateVerbSignatureProbabilitiesPerVerb(global_verb_sig_count, verb)
             for arg in arguments:
                 sig_verb_prob_one = 1
-                origin = self.getOriginFromArgument(arg)
-                if origin:
-                    verb_sig = self.getVerbSignature(action)
-                    sig_verb_str = self.verbSignatureToString(verb_sig)
-                    sig_verb_prob_one = key_value_list_dict[verb + "-" + sig_verb_str]
+                verb_sig = self.getVerbSignature(action)
+                sig_verb_str = self.verbSignatureToString(verb_sig)
+                sig_verb_prob_one = key_value_list_dict[verb + "-" + sig_verb_str]
             probabilities_list.append(sig_verb_prob_one)
         sig_verb_prob_prod = np.prod(probabilities_list)
         return sig_verb_prob_prod
@@ -541,6 +543,7 @@ class Recipe(object):
 
     def probOriginConnection(self, global_connection_count):
         graph = self.graph
+        print graph
         probabilities_list = []
         for action in graph:
             arguments = self.getArgumentsFromAction(action)
@@ -549,6 +552,7 @@ class Recipe(object):
                 connection_prob_one = 1
                 origin = self.getOriginFromArgument(arg)
                 if origin:
+                    print "in origin"
                     id1 = self.getIDfromAction(action)
                     # dictionary of all probabilities of all connectios (not only of this graph)
                     probabilities_dict = self.calculateConnectionProbabilities(global_connection_count)
@@ -556,6 +560,8 @@ class Recipe(object):
                     probabilities_list.append(connection_prob_one)
         print probabilities_list
         connection_prob_prod = np.prod(probabilities_list)
+        print "connection_prob_prod: "
+        print connection_prob_prod
         return connection_prob_prod
         
     def calculateConnectionProbabilities(self, global_connection_count):
@@ -707,3 +713,6 @@ global_connection_count = pickle.load(pkl_file)
 # # print amishMeatloaf.verbCounter()
 # # amishMeatloaf.getIngredients()
 # # print amishMeatloaf
+
+chosen_connections = amishMeatloaf.makeConnections(global_verb_count, global_verb_type)
+prior = amishMeatloaf.calculatePriorProbability(global_verb_sig_count, global_connection_count, chosen_connections)

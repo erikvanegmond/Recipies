@@ -34,7 +34,7 @@ for subdir, dirs, files in os.walk(rootdir):
     if c > cmax:
         break
 
-
+'''
 global_verb_count = {}
 global_verb_type = {}
 global_verb_sig_count = {}
@@ -71,7 +71,7 @@ for key in global_verb_sig_count:
 #    global_origin_connection_count[key] += 0.1
 
 
-#
+
 # recipeList[0].makeConnections(global_verb_count, global_verb_type)
 # pprint(recipeList[0].graph)
 for item in recipeList:
@@ -94,3 +94,15 @@ pickle.dump(global_verb_type, output)
 pickle.dump(global_verb_sig_count, output)
 pickle.dump(global_connection_count, output)
 output.close()
+'''
+
+pkl_file = open('globals.pkl', 'r')
+global_verb_count = pickle.load(pkl_file)
+global_verb_type = pickle.load(pkl_file)
+global_verb_sig_count = pickle.load(pkl_file)
+global_connection_count = pickle.load(pkl_file)
+
+for item in recipeList:
+    item.makeConnections(global_verb_count, global_verb_type)
+    item.evaluateGraph(global_verb_sig_count, global_connection_count)
+    
