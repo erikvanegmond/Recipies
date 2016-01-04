@@ -443,7 +443,7 @@ class Recipe(object):
                     else:
                         connection_count[key] = 1
 
-        return (connection_count)
+        return connection_count
         
 
     def mostPobableArguments(self, verb, global_verb_count, global_verb_type):
@@ -550,10 +550,8 @@ class Recipe(object):
                 origin = self.getOriginFromArgument(arg)
                 if origin:
                     id1 = self.getIDfromAction(action)
-                    probabilities_dict = self.calculateConnectionProbabilities(global_connection_verb_sig_count)
+                    probabilities_dict = self.calculateConnectionProbabilities(global_connection_count)
                     connection_prob_one = self.caculateThisConnectionProb(probabilities_dict, id1, origin)
-                                                                                  signature_incoming,
-                                                                                  signature_outgoing)
                     #if not connection_prob_one:
                     #    print verb + "-" + sig_verb_str
             probabilities_list.append(connection_prob_one)
@@ -683,32 +681,30 @@ class Recipe(object):
     def __str__(self):
         return "a recipe based on " + self.filepath
 
-
-amishMeatloaf = Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt")
-# pprint(amishMeatloaf.graph)
-#pkl_file = open('globals.pkl', 'r')
-#global_verb_count = pickle.load(pkl_file)
-#global_verb_type = pickle.load(pkl_file)
-#global_verb_sig_count = pickle.load(pkl_file)
-#global_connection_count = pickle.load(pkl_file)
-#global_origin_connection_count = pickle.load(pkl_file)
-
-#for key in global_verb_sig_count:
-#    global_verb_sig_count[key] += 0.1
-amishMeatloaf.makeConnections(global_verb_count, global_verb_type)
-# (_,global_verb_sig_count) = amishMeatloaf.getCountVerbSignature()
-# pprint(amishMeatloaf.graph)
-# amishMeatloaf.getCountVerbSignature()
-#amishMeatloaf.evaluateGraph(global_verb_sig_count, global_origin_connection_count)
-connection_count = amishMeatloaf.connection_counter()
-
-
-# pprint(amishMeatloaf.graph)
-# amishMeatloaf.getCountVerbSignature()
-# amishMeatloaf.evaluateGraph(global_verb_sig_count, global_connection_verb_sig_count)
-# (connection_count, connec_verb_sig_count) = amishMeatloaf.connectionCounter()
-# amishMeatloaf.change_connection(global_verb_sig_count, global_origin_connection_count)
-amishMeatloaf.prob_verb_given_verb_signature(global_verb_sig_count)
-# print amishMeatloaf.verbCounter()
-# amishMeatloaf.getIngredients()
-# print amishMeatloaf
+# amishMeatloaf = Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt")
+# # pprint(amishMeatloaf.graph)
+# pkl_file = open('globals.pkl', 'r')
+# global_verb_count = pickle.load(pkl_file)
+# global_verb_type = pickle.load(pkl_file)
+# global_verb_sig_count = pickle.load(pkl_file)
+# global_connection_count = pickle.load(pkl_file)
+#
+# #for key in global_verb_sig_count:
+# #    global_verb_sig_count[key] += 0.1
+# amishMeatloaf.makeConnections(global_verb_count, global_verb_type)
+# # (_,global_verb_sig_count) = amishMeatloaf.getCountVerbSignature()
+# # pprint(amishMeatloaf.graph)
+# # amishMeatloaf.getCountVerbSignature()
+# #amishMeatloaf.evaluateGraph(global_verb_sig_count, global_origin_connection_count)
+# connection_count = amishMeatloaf.connection_counter()
+#
+#
+# # pprint(amishMeatloaf.graph)
+# # amishMeatloaf.getCountVerbSignature()
+# # amishMeatloaf.evaluateGraph(global_verb_sig_count, global_connection_verb_sig_count)
+# # (connection_count, connec_verb_sig_count) = amishMeatloaf.connectionCounter()
+# # amishMeatloaf.change_connection(global_verb_sig_count, global_origin_connection_count)
+# amishMeatloaf.prob_verb_given_verb_signature(global_verb_sig_count)
+# # print amishMeatloaf.verbCounter()
+# # amishMeatloaf.getIngredients()
+# # print amishMeatloaf
