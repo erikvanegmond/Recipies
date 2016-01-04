@@ -549,9 +549,10 @@ class Recipe(object):
                 origin = self.getOriginFromArgument(arg)
                 if origin:
                     id1 = self.getIDfromAction(action)
+                    # dictionary of all probabilities of all connectios (not only of this graph)
                     probabilities_dict = self.calculateConnectionProbabilities(global_connection_count)
                     connection_prob_one = self.caculateThisConnectionProb(probabilities_dict, id1, origin)
-            probabilities_list.append(connection_prob_one)
+                    probabilities_list.append(connection_prob_one)
         print probabilities_list
         connection_prob_prod = np.prod(probabilities_list)
         return connection_prob_prod
@@ -678,13 +679,13 @@ class Recipe(object):
     def __str__(self):
         return "a recipe based on " + self.filepath
 
-# amishMeatloaf = Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt")
-# # pprint(amishMeatloaf.graph)
-# pkl_file = open('globals.pkl', 'r')
-# global_verb_count = pickle.load(pkl_file)
-# global_verb_type = pickle.load(pkl_file)
-# global_verb_sig_count = pickle.load(pkl_file)
-# global_connection_count = pickle.load(pkl_file)
+amishMeatloaf = Recipe("..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt")
+# pprint(amishMeatloaf.graph)
+pkl_file = open('globals.pkl', 'r')
+global_verb_count = pickle.load(pkl_file)
+global_verb_type = pickle.load(pkl_file)
+global_verb_sig_count = pickle.load(pkl_file)
+global_connection_count = pickle.load(pkl_file)
 #
 # #for key in global_verb_sig_count:
 # #    global_verb_sig_count[key] += 0.1
