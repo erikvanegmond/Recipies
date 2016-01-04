@@ -16,7 +16,7 @@ recipeList =[]
 fixedPath = "..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt"
 recipeList.append(Recipe(fixedPath))
 c = 0
-cmax = 20000
+cmax = 20
 for subdir, dirs, files in os.walk(rootdir):
     for file in files:
         if file == ".DS_Store":
@@ -34,18 +34,17 @@ for subdir, dirs, files in os.walk(rootdir):
     if c > cmax:
         break
 
-'''
+
 output = open('globals.pkl', 'wb')
 
 global_verb_count = {}
 global_verb_type = {}
 global_verb_sig_count = {}
 global_connection_count = {}
-global_origin_connection_count = {}
 for item in recipeList:
     (verb_count, verb_type) = item.verbCounter()
     (_, verb_sig_count) = item.getCountVerbSignature()
-    (connection_count, connec_verb_sig_count) = item.connectionCounter()
+    connection_count = item.connection_counter()
 
     for vc in verb_count:
             if not vc in global_verb_count:
@@ -67,11 +66,6 @@ for item in recipeList:
             global_connection_count[cc] = global_connection_count[cc]
         else:
             global_connection_count[cc] += global_connection_count[cc]
-    for cvs in connec_verb_sig_count:
-        if not cvs in global_origin_connection_count:
-            global_origin_connection_count[cvs] = global_origin_connection_count[cvs]
-        else:
-            global_origin_connection_count[cvs] += global_origin_connection_count[cvs]
 #for key in global_origin_connection_count:
 #    global_origin_connection_count[key] += 0.1
 
@@ -79,16 +73,14 @@ pickle.dump(global_verb_count, output)
 pickle.dump(global_verb_type, output)
 pickle.dump(global_verb_sig_count, output)
 pickle.dump(global_connection_count, output)
-pickle.dump(global_origin_connection_count, output)
 output.close()
-'''
+
 
 pkl_file = open('globals.pkl', 'r')
 global_verb_count = pickle.load(pkl_file)
 global_verb_type = pickle.load(pkl_file)
 global_verb_signature = pickle.load(pkl_file)
 global_connection_count = pickle.load(pkl_file)
-global_origin_connection_count = pickle.load(pkl_file)
 pkl_file.close()
 
 for key in global_verb_signature:
@@ -100,7 +92,7 @@ pprint(recipeList[0].graph)
 for item in recipeList:
     print item
     item.makeConnections(global_verb_count,global_verb_type)
-    pprint( item.graph )
+    #pprint( item.graph )
     print
 
 
