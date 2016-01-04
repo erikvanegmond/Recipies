@@ -488,8 +488,6 @@ class Recipe(object):
                     verb_sig = self.getVerbSignature(action)
                     sig_verb_str = self.verbSignatureToString(verb_sig)
                     sig_verb_prob_one = key_value_list_dict[verb + "-" + sig_verb_str]
-                    #           if not sig_verb_prob_one:
-                    #               print verb + "-" + sig_verb_str
             probabilities_list.append(sig_verb_prob_one)
         sig_verb_prob_prod = np.prod(probabilities_list)
         return sig_verb_prob_prod
