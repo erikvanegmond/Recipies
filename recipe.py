@@ -458,7 +458,7 @@ class Recipe(object):
         return argumentsTypesList[count_list.index(max(count_list))]
 
     def evaluateGraph(self, global_verb_sig_count, global_origin_connection_count):
-        self.calculatePriorProbability(global_verb_sig_count, global_origin_connection_count)
+        prior = self.calculatePriorProbability(global_verb_sig_count, global_origin_connection_count)
 
     def getProbabilitiesForArguments(self, verb, global_verb_count, global_verb_type):
         count_list = self.getArgumentsCountList(verb, global_verb_type)
@@ -468,10 +468,9 @@ class Recipe(object):
 
     def calculatePriorProbability(self, global_verb_sig_count, global_origin_connection_count):
         sig_verb_prob_prod = self.signatureGivenVerbProbability(global_verb_sig_count)
-        # erased this one, because they weren't to enthausiastic about this in the presentation. Instead I used
-        # the probability of the origin of this connection given all connections (and the verbsig?)
-        # connection_prob_prod = self.sigConnectionProbability(global_connection_verb_sig_count)
-        prob_origin_connection = self.probOriginConnection(global_origin_connection_count)
+        prob_origin_connection = self.probOriginConnection(global_connection_count)
+        prior = sig_verb_prob_prod * prob_origin_connection
+        return prior
 
     def signatureGivenVerbProbability(self, global_verb_sig_count):
         graph = self.graph
@@ -539,7 +538,7 @@ class Recipe(object):
             key_value_list_dict[key] = value
         return key_value_list_dict
 
-    def probOriginConnection(self, global_origin_connection_count):
+    def probOriginConnection(self, global_connection_count):
         graph = self.graph
         probabilities_list = []
         for action in graph:
@@ -552,19 +551,17 @@ class Recipe(object):
                     id1 = self.getIDfromAction(action)
                     probabilities_dict = self.calculateConnectionProbabilities(global_connection_count)
                     connection_prob_one = self.caculateThisConnectionProb(probabilities_dict, id1, origin)
-                    #if not connection_prob_one:
-                    #    print verb + "-" + sig_verb_str
             probabilities_list.append(connection_prob_one)
         print probabilities_list
         connection_prob_prod = np.prod(probabilities_list)
         return connection_prob_prod
         
-    def calculateConnectionProbabilities(self, global_origin_connection_count):
+    def calculateConnectionProbabilities(self, global_connection_count):
         probabilities_dict = {}
-        print global_origin_connection_count
-        total = sum([counts[1] for counts in global_origin_connection_count])
+        print global_connection_count
+        total = sum([counts[1] for counts in global_connection_count])
         print total
-        for key_value in global_origin_connection_count:
+        for key_value in global_connection_count:
             print key_value
             key_value[1] = (key_value[1]/float(total))
             key = key_value[0]
