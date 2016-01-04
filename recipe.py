@@ -457,8 +457,11 @@ class Recipe(object):
         # print count_list.index(max(count_list))
         return argumentsTypesList[count_list.index(max(count_list))]
 
-    def evaluateGraph(self, global_verb_sig_count, global_origin_connection_count):
-        prior = self.calculatePriorProbability(global_verb_sig_count, global_origin_connection_count)
+    def evaluateGraph(self, global_verb_sig_count, global_connection_count):
+        prior = self.calculatePriorProbability(global_verb_sig_count, global_connection_count)
+        prob = self.prob_verb_given_verb_signature(global_verb_sig_count)
+
+        score = prior * prob
 
     def getProbabilitiesForArguments(self, verb, global_verb_count, global_verb_type):
         count_list = self.getArgumentsCountList(verb, global_verb_type)
@@ -466,7 +469,7 @@ class Recipe(object):
         for i, count in enumerate(count_list):
             count_list[i] = count / countSum
 
-    def calculatePriorProbability(self, global_verb_sig_count, global_origin_connection_count):
+    def calculatePriorProbability(self, global_verb_sig_count, global_connection_count):
         sig_verb_prob_prod = self.signatureGivenVerbProbability(global_verb_sig_count)
         prob_origin_connection = self.probOriginConnection(global_connection_count)
         prior = sig_verb_prob_prod * prob_origin_connection
