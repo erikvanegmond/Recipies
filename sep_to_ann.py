@@ -16,7 +16,7 @@ recipeList = []
 fixedPath = "..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt"
 recipeList.append(Recipe(fixedPath))
 c = 0
-cmax = 20
+cmax = 200000
 for subdir, dirs, files in os.walk(rootdir):
     for current_file in files:
         if current_file == ".DS_Store":
@@ -39,8 +39,10 @@ global_verb_count = {}
 global_verb_type = {}
 global_verb_sig_count = {}
 global_connection_count = {}
+c = 0
 for item in recipeList:
-    print item
+    print c
+    c += 1
     (verb_count, verb_type) = item.verbCounter()
     (_, verb_sig_count) = item.getCountVerbSignature()
 
