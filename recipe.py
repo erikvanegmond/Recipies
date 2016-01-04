@@ -172,7 +172,6 @@ class Recipe(object):
                 
                 self.setActionResultFromAction(action, self.determineActionResult(self.getArgumentsFromAction(action)))
                 print chosenConnections 
-                return chosenConnections
                 
         (actionList, connectedActionsList) = self.checkFullGraph()
         print self.getIngredients()
@@ -473,7 +472,7 @@ class Recipe(object):
         for i, count in enumerate(count_list):
             count_list[i] = count / countSum
 
-    def calculatePriorProbability(self, global_verb_sig_count, global_connection_count, chosen_connections):     
+    def calculatePriorProbability(self, global_verb_sig_count, global_connection_count):     
         sig_verb_prob_prod = self.signatureGivenVerbProbability(global_verb_sig_count)
         prob_origin_connection = self.probOriginConnection(global_connection_count)
         prior = sig_verb_prob_prod * prob_origin_connection
@@ -566,17 +565,12 @@ class Recipe(object):
         
     def calculateConnectionProbabilities(self, global_connection_count):
         probabilities_dict = {}
-        print global_connection_count
-        total = sum([counts[1] for counts in global_connection_count])
-        print total
-        for key_value in global_connection_count:
-            print key_value
-            key_value[1] = (key_value[1]/float(total))
-            key = key_value[0]
-            value = key_value[1]
+        total = sum([int(counts[1]) for counts in global_connection_count])
+        for key in global_connection_count:
+            number = global_connection_count[key]
+            value = (number/float(total))
             probabilities_dict[key] = value
-            print "prob dict: "
-            print probabilities_dict
+        print probabilities_dict
         return probabilities_dict
 
     def caculateThisConnectionProb(self, probabilities_dict, id1, origin):
@@ -714,5 +708,5 @@ global_connection_count = pickle.load(pkl_file)
 # # amishMeatloaf.getIngredients()
 # # print amishMeatloaf
 
-chosen_connections = amishMeatloaf.makeConnections(global_verb_count, global_verb_type)
-prior = amishMeatloaf.calculatePriorProbability(global_verb_sig_count, global_connection_count, chosen_connections)
+amishMeatloaf.makeConnections(global_verb_count, global_verb_type)
+prior = amishMeatloaf.calculatePriorProbability(global_verb_sig_count, global_connection_count)
