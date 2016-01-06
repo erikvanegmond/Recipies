@@ -16,7 +16,7 @@ recipeList = []
 fixedPath = "..\\AllRecipesData\\chunked\\BeefMeatLoaf-chunked\\amish-meatloaf.txt"
 recipeList.append(Recipe(fixedPath))
 c = 0
-cmax = 200000
+cmax = 20
 for subdir, dirs, files in os.walk(rootdir):
     for current_file in files:
         if current_file == ".DS_Store":
@@ -105,4 +105,4 @@ global_connection_count = pickle.load(pkl_file)
 for item in recipeList:
     item.makeConnections(global_verb_count, global_verb_type)
     item.evaluateGraph(global_verb_sig_count, global_connection_count)
-    
+    print item.graph

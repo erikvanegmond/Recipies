@@ -171,10 +171,10 @@ class Recipe(object):
                 
                 
                 self.setActionResultFromAction(action, self.determineActionResult(self.getArgumentsFromAction(action)))
-                print chosenConnections 
+                # print chosenConnections
                 
         (actionList, connectedActionsList) = self.checkFullGraph()
-        print self.getIngredients()
+        # print self.getIngredients()
         for actionID in actionList[0:-1]:
             if not actionID in connectedActionsList:
                 need = self.getActionResultFromAction(self.getActionFromID(actionID))
@@ -193,7 +193,7 @@ class Recipe(object):
                     goalID = actionProbs[0][0]
                     self.makeLinkBetween(actionID, goalID)
 
-        print self.isFullGraph()
+        # print self.isFullGraph()
 
     def isFullGraph(self):
         (actionList, connectedActionsList) = self.checkFullGraph()
@@ -381,7 +381,7 @@ class Recipe(object):
         return "".join(verb_sig[0]) + "-" + flag
 
     def verbCounter(self):
-        print "in verbcounter"
+        # print "in verbcounter"
         verb_count = {}
         verb_type = {}
         count_list = self.graph
@@ -428,16 +428,16 @@ class Recipe(object):
         return (verb_count, verb_type)
 
     def connection_counter(self):
-        print "in function"
+        # print "in function"
         connection_count = {}
 
         for action in self.graph:
             arguments = self.getArgumentsFromAction(action)
             for argnum, argument in enumerate(arguments):
                 origin = self.getOriginFromArgument(argument)
-                print origin
+                # print origin
                 if origin:
-                    print "in function with origin"
+                    # print "in function with origin"
                     key = str(self.getOriginFromArgument(argument)) + "-" + str(self.getIDfromAction(action))
 
                     if key in connection_count:
@@ -465,6 +465,11 @@ class Recipe(object):
         prob = self.prob_verb_given_verb_signature(global_verb_sig_count)
 
         score = prior * prob
+
+        # print self
+        # print str(len(self.graph))
+        print score * len(self.graph)
+        # print
 
     def getProbabilitiesForArguments(self, verb, global_verb_count, global_verb_type):
         count_list = self.getArgumentsCountList(verb, global_verb_type)
@@ -542,7 +547,7 @@ class Recipe(object):
 
     def probOriginConnection(self, global_connection_count):
         graph = self.graph
-        print graph
+        # print graph
         probabilities_list = []
         for action in graph:
             arguments = self.getArgumentsFromAction(action)
@@ -551,16 +556,16 @@ class Recipe(object):
                 connection_prob_one = 1
                 origin = self.getOriginFromArgument(arg)
                 if origin:
-                    print "in origin"
+                    # print "in origin"
                     id1 = self.getIDfromAction(action)
                     # dictionary of all probabilities of all connectios (not only of this graph)
                     probabilities_dict = self.calculateConnectionProbabilities(global_connection_count)
                     connection_prob_one = self.caculateThisConnectionProb(probabilities_dict, id1, origin)
                     probabilities_list.append(connection_prob_one)
-        print probabilities_list
+        # print probabilities_list
         connection_prob_prod = np.prod(probabilities_list)
-        print "connection_prob_prod: "
-        print connection_prob_prod
+        # print "connection_prob_prod: "
+        # print connection_prob_prod
         return connection_prob_prod
         
     def calculateConnectionProbabilities(self, global_connection_count):
@@ -570,7 +575,7 @@ class Recipe(object):
             number = global_connection_count[key]
             value = (number/float(total))
             probabilities_dict[key] = value
-        print probabilities_dict
+        # print probabilities_dict
         return probabilities_dict
 
     def caculateThisConnectionProb(self, probabilities_dict, id1, origin):
